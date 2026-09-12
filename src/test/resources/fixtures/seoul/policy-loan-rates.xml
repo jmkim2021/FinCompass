@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<PolicyLoanRate>
+<searchLoOrgIrList>
   <list_total_count>1</list_total_count>
+  <RESULT>
+    <CODE>INFO-000</CODE>
+    <MESSAGE>정상 처리되었습니다.</MESSAGE>
+  </RESULT>
   <row><institutionName>Example Institution</institutionName><rate>3.10</rate></row>
-</PolicyLoanRate>
+</searchLoOrgIrList>

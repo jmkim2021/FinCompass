@@ -1,5 +1,7 @@
 {
   "result": {
+    "err_cd": "000",
+    "err_msg": "정상",
     "prdt_div": "M",
     "baseList": [
       {"fin_co_no":"0010001","kor_co_nm":"Example Bank","fin_prdt_cd":"MORTGAGE-001"}

@@ -42,22 +42,27 @@ public class SourceRunLifecycleService {
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public String completeSuccess(long sourceRunId, RawSourceResponse response) {
+    public String preserveRawSnapshot(long sourceRunId, RawSourceResponse response) {
         SourceRun sourceRun = findRun(sourceRunId);
-        Instant completedAt = Instant.now();
+        Instant fetchedAt = Instant.now();
         String payloadHash = payloadHasher.sha256(response.rawPayload());
 
-        rawSnapshotRepository.save(RawSnapshot.create(
+        rawSnapshotRepository.saveAndFlush(RawSnapshot.create(
                 sourceRun,
                 response.contentType(),
                 response.rawPayload(),
                 payloadHash,
-                completedAt,
-                completedAt
+                fetchedAt,
+                fetchedAt
         ));
-        sourceRun.markSuccess(response.httpStatus(), completedAt);
-        sourceRunRepository.saveAndFlush(sourceRun);
         return payloadHash;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void completeSuccess(long sourceRunId, int httpStatus) {
+        SourceRun sourceRun = findRun(sourceRunId);
+        sourceRun.markSuccess(httpStatus, Instant.now());
+        sourceRunRepository.saveAndFlush(sourceRun);
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)

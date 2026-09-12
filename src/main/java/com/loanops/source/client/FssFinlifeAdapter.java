@@ -1,5 +1,8 @@
 package com.loanops.source.client;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.loanops.source.config.FssFinlifeProperties;
 import com.loanops.source.config.SourceRestClientFactory;
 import com.loanops.source.domain.DataSourceCode;
@@ -17,10 +20,16 @@ public class FssFinlifeAdapter implements SourceAdapter {
 
     private final FssFinlifeProperties properties;
     private final RestClient restClient;
+    private final ObjectMapper objectMapper;
 
-    public FssFinlifeAdapter(FssFinlifeProperties properties, SourceRestClientFactory restClientFactory) {
+    public FssFinlifeAdapter(
+            FssFinlifeProperties properties,
+            SourceRestClientFactory restClientFactory,
+            ObjectMapper objectMapper
+    ) {
         this.properties = properties;
         this.restClient = restClientFactory.create(properties.connectTimeout(), properties.readTimeout());
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -50,6 +59,27 @@ public class FssFinlifeAdapter implements SourceAdapter {
                 response.getBody() == null ? "" : response.getBody(),
                 response.getStatusCode().value()
         );
+    }
+
+    @Override
+    public SourceResponseValidation validate(RawSourceResponse response) {
+        try {
+            JsonNode root = objectMapper.readTree(response.rawPayload());
+            if (root == null) {
+                return SourceResponseValidation.failure(null);
+            }
+            JsonNode resultCode = root.path("result").path("err_cd");
+            if (resultCode.isMissingNode() || resultCode.isNull()) {
+                return SourceResponseValidation.failure(null);
+            }
+
+            String code = resultCode.asText();
+            return "000".equals(code)
+                    ? SourceResponseValidation.success(code)
+                    : SourceResponseValidation.failure(code);
+        } catch (JsonProcessingException exception) {
+            return SourceResponseValidation.failure(null);
+        }
     }
 
     private void requireConfiguration() {

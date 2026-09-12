@@ -52,10 +52,11 @@ Each ingestion attempt follows one explicit lifecycle:
 
 1. Persist a `RUNNING` `SourceRun` in its own transaction.
 2. Call the configured official API outside that transaction.
-3. On success, preserve the exact response text and its SHA-256 hash in a new `RawSnapshot`, then mark the run `SUCCESS` in one transaction.
-4. On failure, persist a sanitized error classification and mark the run `FAILED` in a separate transaction before propagating an application exception.
+3. Preserve every HTTP response body and its SHA-256 hash in a new `RawSnapshot` before interpreting the source result code.
+4. Treat only Seoul `INFO-000` and FinLife `result.err_cd=000` as source-level success.
+5. Mark the run `SUCCESS`, or persist a sanitized `UPSTREAM_ERROR` and mark it `FAILED`, in an independent transaction before returning or propagating an application exception.
 
-The current adapters are `FSS_FINLIFE` for JSON and `SEOUL_POLICY_LOAN_RATE` for XML. Responses are not parsed into financial-domain entities in this phase. Test fixtures are deterministic test inputs only and are never used as production fallback data.
+An HTTP 2xx status alone is not sufficient for source execution success. The current adapters are `FSS_FINLIFE` for JSON and `SEOUL_POLICY_LOAN_RATE` for XML. Response inspection is limited to source-level result metadata and does not perform financial-domain normalization. Test fixtures are deterministic test inputs only and are never used as production fallback data.
 
 ## Manual official-API ingestion
 

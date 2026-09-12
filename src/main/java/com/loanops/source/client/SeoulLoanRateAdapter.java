@@ -9,7 +9,15 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
+import java.io.StringReader;
 import java.net.URI;
 
 @Component
@@ -48,6 +56,35 @@ public class SeoulLoanRateAdapter implements SourceAdapter {
                 response.getBody() == null ? "" : response.getBody(),
                 response.getStatusCode().value()
         );
+    }
+
+    @Override
+    public SourceResponseValidation validate(RawSourceResponse response) {
+        String code = resultCode(response.rawPayload());
+        return "INFO-000".equals(code)
+                ? SourceResponseValidation.success(code)
+                : SourceResponseValidation.failure(code);
+    }
+
+    private String resultCode(String payload) {
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+            factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+            factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+            factory.setXIncludeAware(false);
+            factory.setExpandEntityReferences(false);
+
+            Document document = factory.newDocumentBuilder()
+                    .parse(new InputSource(new StringReader(payload)));
+            NodeList codes = document.getElementsByTagName("CODE");
+            if (codes.getLength() == 0) {
+                return null;
+            }
+            return codes.item(0).getTextContent().strip();
+        } catch (ParserConfigurationException | SAXException | IOException exception) {
+            return null;
+        }
     }
 
     private void requireConfiguration() {

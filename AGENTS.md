@@ -23,6 +23,7 @@
 - Do not silently catch, suppress, or discard exceptions.
 - Keep failed source executions as failed records with their diagnostic context.
 - Commit the initial `RUNNING` execution before making the external request, and commit `SUCCESS` or `FAILED` independently so an exception cannot erase the execution record.
+- Do not equate HTTP transport success with source success. Preserve the raw body first, then validate the source-specific result code.
 - Store only sanitized operational error messages. Never persist or log API keys or authenticated request URLs.
 - A manual retry creates a new execution linked to the original failed execution; it never mutates the original record.
 - Keep collection failure independent from deletion or replacement of serving data.

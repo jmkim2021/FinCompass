@@ -72,7 +72,7 @@ class SourceIngestionIntegrationTest {
         registry.add("loanops.sources.fss-finlife.api-key", () -> TEST_API_KEY);
         registry.add("loanops.sources.fss-finlife.read-timeout", () -> "500ms");
         registry.add("loanops.sources.seoul-loan-rate.base-url", WIRE_MOCK::baseUrl);
-        registry.add("loanops.sources.seoul-loan-rate.service-name", () -> "PolicyLoanRate");
+        registry.add("loanops.sources.seoul-loan-rate.service-name", () -> "dreamMoney");
         registry.add("loanops.sources.seoul-loan-rate.api-key", () -> TEST_API_KEY);
         registry.add("loanops.sources.seoul-loan-rate.read-timeout", () -> "2s");
     }
@@ -126,7 +126,7 @@ class SourceIngestionIntegrationTest {
     @Test
     void seoulSuccessPreservesExactXmlAndHash() throws Exception {
         String payload = fixture("fixtures/seoul/policy-loan-rates.xml");
-        WIRE_MOCK.stubFor(get(urlPathEqualTo("/" + TEST_API_KEY + "/xml/PolicyLoanRate/1/1000"))
+        WIRE_MOCK.stubFor(get(urlPathEqualTo("/" + TEST_API_KEY + "/xml/dreamMoney/1/1000"))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/xml;charset=UTF-8")
@@ -140,6 +140,56 @@ class SourceIngestionIntegrationTest {
         assertThat(snapshot.getRawPayload()).isEqualTo(payload);
         assertThat(snapshot.getPayloadHash()).isEqualTo(sha256(payload));
         assertThat(snapshot.getContentType()).isEqualTo("application/xml;charset=UTF-8");
+    }
+
+    @Test
+    void seoulHttp200UpstreamErrorPreservesRawSnapshotAndPersistsFailedRun() throws Exception {
+        String payload = fixture("fixtures/seoul/upstream-error.xml");
+        WIRE_MOCK.stubFor(get(urlPathEqualTo("/" + TEST_API_KEY + "/xml/dreamMoney/1/1000"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/xml;charset=UTF-8")
+                        .withBody(payload)));
+
+        SourceIngestionException thrown = assertThrows(
+                SourceIngestionException.class,
+                () -> ingestionService.ingest(DataSourceCode.SEOUL_POLICY_LOAN_RATE)
+        );
+
+        SourceRun run = sourceRunRepository.findById(thrown.getSourceRunId()).orElseThrow();
+        RawSnapshot snapshot = rawSnapshotRepository.findBySourceRunId(run.getId()).orElseThrow();
+        assertThat(run.getStatus()).isEqualTo(SourceRunStatus.FAILED);
+        assertThat(run.getHttpStatus()).isEqualTo(200);
+        assertThat(run.getErrorType()).isEqualTo(SourceRunErrorType.UPSTREAM_ERROR);
+        assertThat(run.getErrorMessage()).isEqualTo("Upstream source returned result code ERROR-500");
+        assertThat(thrown.getErrorType()).isEqualTo(SourceRunErrorType.UPSTREAM_ERROR);
+        assertThat(thrown).hasMessage("Upstream source returned result code ERROR-500");
+        assertThat(snapshot.getRawPayload()).isEqualTo(payload);
+        assertThat(snapshot.getPayloadHash()).isEqualTo(sha256(payload));
+    }
+
+    @Test
+    void fssHttp200UpstreamErrorPreservesRawSnapshotAndPersistsFailedRun() throws Exception {
+        String payload = fixture("fixtures/fss/upstream-error.json");
+        WIRE_MOCK.stubFor(get(urlPathEqualTo("/fss"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json;charset=UTF-8")
+                        .withBody(payload)));
+
+        SourceIngestionException thrown = assertThrows(
+                SourceIngestionException.class,
+                () -> ingestionService.ingest(DataSourceCode.FSS_FINLIFE)
+        );
+
+        SourceRun run = sourceRunRepository.findById(thrown.getSourceRunId()).orElseThrow();
+        RawSnapshot snapshot = rawSnapshotRepository.findBySourceRunId(run.getId()).orElseThrow();
+        assertThat(run.getStatus()).isEqualTo(SourceRunStatus.FAILED);
+        assertThat(run.getHttpStatus()).isEqualTo(200);
+        assertThat(run.getErrorType()).isEqualTo(SourceRunErrorType.UPSTREAM_ERROR);
+        assertThat(run.getErrorMessage()).isEqualTo("Upstream source returned result code E101");
+        assertThat(snapshot.getRawPayload()).isEqualTo(payload);
+        assertThat(snapshot.getPayloadHash()).isEqualTo(sha256(payload));
     }
 
     @Test
@@ -199,7 +249,7 @@ class SourceIngestionIntegrationTest {
     @Test
     void runningRunIsQueryableWhileExternalCallIsInProgress() throws Exception {
         String payload = fixture("fixtures/seoul/policy-loan-rates.xml");
-        WIRE_MOCK.stubFor(get(urlPathEqualTo("/" + TEST_API_KEY + "/xml/PolicyLoanRate/1/1000"))
+        WIRE_MOCK.stubFor(get(urlPathEqualTo("/" + TEST_API_KEY + "/xml/dreamMoney/1/1000"))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/xml")
@@ -243,7 +293,7 @@ class SourceIngestionIntegrationTest {
         assertThat(tables).containsExactly("data_sources", "raw_snapshots", "source_runs");
         assertThat(publicTableCount).isZero();
         assertThat(jdbcTemplate.queryForObject(
-                "SELECT success FROM loanops.flyway_schema_history WHERE version = '2'",
+                "SELECT success FROM loanops.flyway_schema_history WHERE version = '3'",
                 Boolean.class
         )).isTrue();
     }

@@ -2,6 +2,7 @@ package com.loanops.source.service;
 
 import com.loanops.source.client.RawSourceResponse;
 import com.loanops.source.client.SourceAdapter;
+import com.loanops.source.client.SourceResponseValidation;
 import com.loanops.source.domain.DataSourceCode;
 import com.loanops.source.domain.SourceRunErrorType;
 import org.springframework.stereotype.Service;
@@ -38,13 +39,43 @@ public class SourceIngestionService {
             throw persistFailure(sourceRunId, sourceCode, errorClassifier.classify(exception));
         }
 
+        String payloadHash;
         try {
-            String payloadHash = lifecycleService.completeSuccess(sourceRunId, response);
+            payloadHash = lifecycleService.preserveRawSnapshot(sourceRunId, response);
+        } catch (RuntimeException exception) {
+            SourceFailure failure = new SourceFailure(
+                    SourceRunErrorType.UNKNOWN_ERROR,
+                    "HTTP response body could not be preserved",
+                    response.httpStatus()
+            );
+            throw persistFailure(sourceRunId, sourceCode, failure);
+        }
+
+        SourceResponseValidation validation;
+        try {
+            validation = adapter.validate(response);
+        } catch (RuntimeException exception) {
+            validation = SourceResponseValidation.failure(null);
+        }
+        if (!validation.successful()) {
+            throw persistFailure(
+                    sourceRunId,
+                    sourceCode,
+                    new SourceFailure(
+                            SourceRunErrorType.UPSTREAM_ERROR,
+                            upstreamErrorMessage(validation.resultCode()),
+                            response.httpStatus()
+                    )
+            );
+        }
+
+        try {
+            lifecycleService.completeSuccess(sourceRunId, response.httpStatus());
             return new IngestionResult(sourceRunId, sourceCode, response.httpStatus(), payloadHash);
         } catch (RuntimeException exception) {
             SourceFailure failure = new SourceFailure(
                     SourceRunErrorType.UNKNOWN_ERROR,
-                    "Successful response could not be persisted",
+                    "Successful source response could not be completed",
                     response.httpStatus()
             );
             throw persistFailure(sourceRunId, sourceCode, failure);
@@ -71,6 +102,17 @@ public class SourceIngestionService {
             throw new IllegalArgumentException("No source adapter configured for: " + sourceCode);
         }
         return adapter;
+    }
+
+    private String upstreamErrorMessage(String resultCode) {
+        if (resultCode == null || resultCode.isBlank()) {
+            return "Upstream source response is missing a valid result code";
+        }
+        String sanitizedCode = resultCode.replaceAll("[^A-Za-z0-9_-]", "?");
+        if (sanitizedCode.length() > 64) {
+            sanitizedCode = sanitizedCode.substring(0, 64);
+        }
+        return "Upstream source returned result code " + sanitizedCode;
     }
 
     private Map<DataSourceCode, SourceAdapter> indexAdapters(List<SourceAdapter> sourceAdapters) {

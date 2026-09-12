@@ -7,4 +7,6 @@ public interface SourceAdapter {
     DataSourceCode sourceCode();
 
     RawSourceResponse fetch();
+
+    SourceResponseValidation validate(RawSourceResponse response);
 }
