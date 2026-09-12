@@ -22,6 +22,8 @@
 - Persist external API failures and make them observable.
 - Do not silently catch, suppress, or discard exceptions.
 - Keep failed source executions as failed records with their diagnostic context.
+- Commit the initial `RUNNING` execution before making the external request, and commit `SUCCESS` or `FAILED` independently so an exception cannot erase the execution record.
+- Store only sanitized operational error messages. Never persist or log API keys or authenticated request URLs.
 - A manual retry creates a new execution linked to the original failed execution; it never mutates the original record.
 - Keep collection failure independent from deletion or replacement of serving data.
 
@@ -32,6 +34,6 @@
 - Use deterministic tests and explicit assertions for data integrity, provenance, failure handling, and serving isolation when those capabilities are introduced.
 - Keep test fixtures and fault-injection data out of production data tables.
 
-## Phase 1 boundary
+## Phase 2 boundary
 
-Phase 1 contains only the executable Spring Boot foundation, PostgreSQL and Flyway configuration, Actuator health, OpenAPI/Swagger, Docker Compose, and PostgreSQL integration testing. Do not add LoanOps business entities, external API adapters, quality rules, quarantine, retry, security, audit, frontend, or AI features in this phase.
+Phase 2 contains the Phase 1 foundation plus `DataSource`, `SourceRun`, `RawSnapshot`, minimal FSS and Seoul adapters, explicit source-run lifecycle transactions, raw-payload hashing, and profile-gated manual ingestion. Do not add financial-domain normalization, institution matching, quality rules, quarantine, serving tables, change detection, retry behavior, scheduling, security, audit, frontend, or AI features in this phase.

@@ -60,7 +60,7 @@ class LoanOpsApplicationIntegrationTest {
                         Boolean.class))
                 .isTrue();
         assertThat(jdbcTemplate.queryForObject(
-                        "SELECT success FROM flyway_schema_history WHERE version = '1'",
+                        "SELECT success FROM loanops.flyway_schema_history WHERE version = '1'",
                         Boolean.class))
                 .isTrue();
     }

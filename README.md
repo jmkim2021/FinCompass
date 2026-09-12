@@ -1,8 +1,8 @@
 # LoanOps
 
-LoanOps is a financial public-data integration and operations platform focused on correctness, traceability, data integrity, and operational reliability. This repository currently contains Phase 1 only: the executable backend foundation and verified PostgreSQL wiring.
+LoanOps is a financial public-data integration and operations platform focused on correctness, traceability, data integrity, and operational reliability. The current implementation includes the Phase 1 backend foundation and the Phase 2 external-source execution and raw-response preservation layer.
 
-## Phase 1 stack
+## Stack
 
 - Java 21
 - Spring Boot 3.5.16
@@ -12,7 +12,7 @@ LoanOps is a financial public-data integration and operations platform focused o
 - Flyway
 - Spring Boot Actuator
 - springdoc OpenAPI 2.9.1
-- JUnit 5 and Testcontainers 2.0.5
+- JUnit 5, Testcontainers 2.0.5, and WireMock 3.13.2
 - Docker Compose
 
 ## Prerequisites
@@ -44,11 +44,41 @@ set +a
 ./gradlew bootRun
 ```
 
-The application intentionally has no hard-coded database credential fallback. It fails fast when `DATABASE_URL`, `DATABASE_USERNAME`, or `DATABASE_PASSWORD` is missing.
+The application intentionally has no hard-coded database credential fallback. It fails fast when `DATABASE_URL`, `DATABASE_USERNAME`, or `DATABASE_PASSWORD` is missing. Official API credentials and endpoints are also supplied only through environment variables.
+
+## Phase 2 data flow
+
+Each ingestion attempt follows one explicit lifecycle:
+
+1. Persist a `RUNNING` `SourceRun` in its own transaction.
+2. Call the configured official API outside that transaction.
+3. On success, preserve the exact response text and its SHA-256 hash in a new `RawSnapshot`, then mark the run `SUCCESS` in one transaction.
+4. On failure, persist a sanitized error classification and mark the run `FAILED` in a separate transaction before propagating an application exception.
+
+The current adapters are `FSS_FINLIFE` for JSON and `SEOUL_POLICY_LOAN_RATE` for XML. Responses are not parsed into financial-domain entities in this phase. Test fixtures are deterministic test inputs only and are never used as production fallback data.
+
+## Manual official-API ingestion
+
+Manual ingestion is disabled during normal startup and runs only with the `manual-ingestion` profile. Set the relevant variables in your uncommitted `.env` file, including the API key, base URL, and source-specific path or service name. Then run one source:
+
+```bash
+set -a
+source .env
+set +a
+./gradlew bootRun --args='--spring.profiles.active=manual-ingestion --loanops.manual.source=FSS_FINLIFE'
+```
+
+For the Seoul source:
+
+```bash
+./gradlew bootRun --args='--spring.profiles.active=manual-ingestion --loanops.manual.source=SEOUL_POLICY_LOAN_RATE'
+```
+
+The profile uses a non-web application context, performs exactly one attempt, prints only the source code, run ID, status metadata, and payload hash, and then exits. It never prints API keys or authenticated request URLs. A failed attempt remains stored as `FAILED` and causes the command to fail. There is no automatic retry or scheduler.
 
 ## Verification
 
-Run the complete test suite. The integration tests start a real PostgreSQL 17.11 container and do not use H2:
+Run the complete test suite. The integration tests start real PostgreSQL 17.11 containers, use WireMock for deterministic HTTP behavior, and do not use H2 or real API credentials:
 
 ```bash
 ./gradlew test
@@ -77,4 +107,4 @@ docker compose --env-file .env down --volumes
 
 ## Current phase boundary
 
-Phase 1 does not include business entities, source executions, raw snapshots, official API clients, adapters, product or rate models, data-quality logic, quarantine, change detection, retries, security, audit, frontend, or AI features. Those capabilities belong to later approved phases.
+Phase 2 includes only source definitions, source execution records, exact raw snapshots, official API adapters, explicit failure persistence, and profile-gated manual ingestion. It does not include financial institutions, products, terms, rate observations, normalization, institution matching, data-quality rules, quarantine, serving tables, change detection, retries, scheduling, security, audit, frontend, or AI features.

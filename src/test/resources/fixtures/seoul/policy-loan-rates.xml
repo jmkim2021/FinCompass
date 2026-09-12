@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PolicyLoanRate>
+  <list_total_count>1</list_total_count>
+  <row><institutionName>Example Institution</institutionName><rate>3.10</rate></row>
+</PolicyLoanRate>
