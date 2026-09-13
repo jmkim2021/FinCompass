@@ -10,7 +10,7 @@ const navigation: Array<{ id: View; label: string; marker: string }> = [
   { id: 'dashboard', label: '운영 현황', marker: 'OV' },
   { id: 'runs', label: '수집 이력', marker: 'SR' },
   { id: 'quality', label: '데이터 품질', marker: 'DQ' },
-  { id: 'serving', label: '서비스 데이터', marker: 'SD' },
+  { id: 'serving', label: '제공 데이터', marker: 'SD' },
 ]
 
 export default function App() {

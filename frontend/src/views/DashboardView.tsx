@@ -6,7 +6,7 @@ import { ErrorState, LoadingState } from '../components/UiState'
 import { formatTime } from '../displayText'
 import type { DataChange, Overview, PageResponse, Publication } from '../types'
 
-const LIFECYCLE_STEPS = ['수집', '정규화', '품질 검증', '게시', '서비스'] as const
+const LIFECYCLE_STEPS = ['수집', '정규화', '품질 검증', '서비스 반영', '데이터 제공'] as const
 
 export function DashboardView() {
   const [overview, setOverview] = useState<Overview | null>(null)
@@ -36,8 +36,8 @@ export function DashboardView() {
       <header className="view-header">
         <div>
           <p className="eyebrow">운영 개요</p>
-          <h1>한눈에 보는 데이터 신뢰성</h1>
-          <p>현재 서비스 상태와 이를 뒷받침하는 불변 실행 이력입니다.</p>
+          <h1>금융 데이터 운영 현황</h1>
+          <p>수집부터 서비스 반영까지의 처리 상태와 운영 이력을 한눈에 확인합니다.</p>
         </div>
         <span className="freshness">실시간 DB 조회</span>
       </header>
@@ -52,27 +52,27 @@ export function DashboardView() {
       </section>
 
       <section className="metric-grid">
-        <MetricCard label="서비스 상품" value={overview.servingLoanProductCount} detail={`현재 약정 ${overview.servingProductTermCount}건`} />
-        <MetricCard label="서울시 대출실행 통계" value={overview.servingSeoulObservationCount} detail="정책연계 대출실행 통계" />
-        <MetricCard label="품질 이슈" value={overview.totalQualityIssueCount} detail={`격리 레코드 ${overview.currentQuarantineCount}건`} />
-        <MetricCard label="최근 변경" value={overview.recentDataChangeCount} detail="최근 7일 기록" />
+        <MetricCard label="현재 제공 상품" value={overview.servingLoanProductCount} detail={`금리 조건 ${overview.servingProductTermCount}건`} />
+        <MetricCard label="서울시 대출 실행 통계" value={overview.servingSeoulObservationCount} detail="정책연계 대출 실행 통계" />
+        <MetricCard label="품질 검증 이슈" value={overview.totalQualityIssueCount} detail={`격리 데이터 ${overview.currentQuarantineCount}건`} />
+        <MetricCard label="최근 데이터 변경" value={overview.recentDataChangeCount} detail="최근 7일" />
       </section>
 
       <section className="panel-grid two-columns">
         <article className="panel">
           <div className="panel-heading">
-            <div><p className="eyebrow">소스</p><h2>소스별 최신 처리 상태</h2></div>
-            <span className="count-label">{overview.sourceCount}개 설정됨</span>
+            <div><p className="eyebrow">데이터 소스</p><h2>데이터 소스 처리 현황</h2></div>
+            <span className="count-label">연결 소스 {overview.sourceCount}개</span>
           </div>
           <div className="source-cards">
             {overview.sources.map((source) => (
               <div className="source-card" key={source.sourceCode}>
                 <div className="source-title">
                   <div className="source-mark">{source.sourceCode === 'FSS_FINLIFE' ? 'FS' : 'SO'}</div>
-                  <div><strong>{source.sourceCode}</strong><small>최신 실행 #{source.latestSourceRunId ?? '—'}</small></div>
+                  <div><strong>{source.sourceCode}</strong><small>최근 수집 #{source.latestSourceRunId ?? '—'}</small></div>
                 </div>
                 <div className="status-row"><span>수집</span><StatusBadge value={source.ingestionStatus} /></div>
-                <div className="status-row"><span>게시</span><StatusBadge value={source.publicationStatus} /></div>
+                <div className="status-row"><span>서비스 반영</span><StatusBadge value={source.publicationStatus} /></div>
                 <div className="source-meta">
                   <span>정책 {source.qualityPolicyVersion ?? '—'}</span>
                   <span>{formatTime(source.publishedAt)}</span>
@@ -83,11 +83,11 @@ export function DashboardView() {
         </article>
 
         <article className="panel">
-          <div className="panel-heading"><div><p className="eyebrow">게시</p><h2>최근 게시 결과</h2></div></div>
+          <div className="panel-heading"><div><p className="eyebrow">서비스 반영</p><h2>최근 서비스 반영 결과</h2></div></div>
           <div className="compact-list">
             {publications.map((publication) => (
               <div className="compact-row" key={publication.id}>
-                <div><strong>실행 #{publication.sourceRunId}</strong><small>{publication.sourceCode}</small></div>
+                <div><strong>수집 #{publication.sourceRunId}</strong><small>{publication.sourceCode}</small></div>
                 <StatusBadge value={publication.status} />
                 <span className="mono">{publication.qualityPolicyVersion}</span>
               </div>
@@ -97,16 +97,16 @@ export function DashboardView() {
       </section>
 
       <section className="panel">
-        <div className="panel-heading"><div><p className="eyebrow">추적성</p><h2>최근 데이터 변경</h2></div></div>
+        <div className="panel-heading"><div><p className="eyebrow">변경 추적</p><h2>최근 데이터 변경</h2></div></div>
         <div className="table-wrap">
           <table>
-            <thead><tr><th>실행</th><th>레코드 유형</th><th>변경</th><th>현재 레코드</th><th>변경 필드</th><th>기록 시각</th></tr></thead>
+            <thead><tr><th>수집</th><th>데이터 유형</th><th>변경</th><th>현재 데이터</th><th>변경 필드</th><th>변경 일시</th></tr></thead>
             <tbody>
               {changes.map((change) => (
                 <tr key={change.id}>
                   <td className="mono">#{change.sourceRunId}</td><td>{change.recordType.replaceAll('_', ' ')}</td>
                   <td><StatusBadge value={change.changeType} /></td><td className="mono">#{change.currentRecordId}</td>
-                  <td>{change.changedFields ?? '신규 레코드'}</td><td>{formatTime(change.createdAt)}</td>
+                  <td>{change.changedFields ?? '신규 데이터'}</td><td>{formatTime(change.createdAt)}</td>
                 </tr>
               ))}
             </tbody>
