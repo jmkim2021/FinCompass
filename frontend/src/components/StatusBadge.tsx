@@ -1,3 +1,5 @@
+import { formatStatus } from '../displayText'
+
 interface StatusBadgeProps {
   value: string | null
 }
@@ -12,5 +14,5 @@ export function StatusBadge({ value }: StatusBadgeProps) {
         ? 'pending'
         : 'neutral'
 
-  return <span className={`status-badge status-${tone}`}>{status.replaceAll('_', ' ')}</span>
+  return <span className={`status-badge status-${tone}`}>{formatStatus(value)}</span>
 }
