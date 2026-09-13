@@ -1,6 +1,6 @@
 # LoanOps
 
-LoanOps is a financial public-data integration and operations platform focused on correctness, traceability, data integrity, and operational reliability. The current implementation includes the backend foundation, external-source execution and raw-response preservation, source-specific normalization, and Phase 4 quality-controlled publication.
+LoanOps is a financial public-data integration and operations platform focused on correctness, traceability, data integrity, and operational reliability. It includes official-source ingestion, immutable raw preservation, source-specific normalization, quality-controlled publication, read-only operational APIs, and a React operations console.
 
 ## Stack
 
@@ -14,10 +14,30 @@ LoanOps is a financial public-data integration and operations platform focused o
 - springdoc OpenAPI 2.9.1
 - JUnit 5, Testcontainers 2.0.5, and WireMock 3.13.2
 - Docker Compose
+- React 19, TypeScript, and Vite 7
+
+## Architecture
+
+```mermaid
+flowchart LR
+    API[Official financial and public APIs] --> RUN[SourceRun]
+    RUN --> RAW[Immutable RawSnapshot]
+    RAW --> NORMAL[Source-specific normalization]
+    NORMAL --> QUALITY[Deterministic quality validation]
+    QUALITY -->|invalid| QUARANTINE[Quality issues and quarantine]
+    QUALITY -->|valid| PUBLICATION[PublicationRun]
+    PUBLICATION --> SERVING[Current serving pointers]
+    SERVING --> READ[Read-only /api/v1 APIs]
+    READ --> UI[React operations console]
+    PUBLICATION --> CHANGES[DataChange history]
+```
+
+Ingestion, normalization, quality validation, publication, and serving are deliberately separate lifecycle stages. Every current serving record remains traceable through its normalized record and raw snapshot to the exact source execution.
 
 ## Prerequisites
 
 - JDK 21
+- Node.js 20.19+ and npm
 - Docker Desktop or another Docker-compatible runtime with Compose
 
 ## Local setup
@@ -141,12 +161,60 @@ set +a
 
 The command returns `PROMOTED`, `REJECTED_QUALITY`, or `NO_CHANGE` with sanitized issue, quarantine, and change counts. Re-running a finalized source run safely returns the existing publication result.
 
+## Phase 5 read-only interface
+
+All portfolio and dashboard APIs are read-only and use dedicated response DTOs. JPA entities, authenticated source URLs, API keys, and complete raw payloads are never serialized. Operational lists use deterministic database ordering and zero-based pagination with a maximum page size of 100.
+
+| Endpoint | Purpose |
+| --- | --- |
+| `GET /api/v1/overview` | Source lifecycle, serving, quality, quarantine, and recent seven-day change counts |
+| `GET /api/v1/source-runs` | Filtered and paginated source execution history |
+| `GET /api/v1/source-runs/{id}` | Source, snapshot metadata, publication, and normalized-count detail |
+| `GET /api/v1/publications` | Paginated final publication decisions |
+| `GET /api/v1/publications/{id}` | Publication with quality, quarantine, and change evidence |
+| `GET /api/v1/quality-issues` | Filtered and paginated quality evidence |
+| `GET /api/v1/data-changes` | Filtered and paginated serving change history |
+| `GET /api/v1/serving/loan-products` | Current FSS products reached through serving pointers |
+| `GET /api/v1/serving/loan-products/{id}` | Current FSS product and current product terms |
+| `GET /api/v1/serving/loan-rate-observations` | Current Seoul policy-linked commercial-bank loan execution statistics |
+
+Raw snapshot information is metadata-only: content type, SHA-256 hash, payload byte size, and fetch timestamp. No raw-preview endpoint is included.
+
+For local frontend development, the backend allows `http://localhost:5173` only. Override the comma-separated allowlist with `LOANOPS_API_ALLOWED_ORIGINS`; wildcard CORS is not used.
+
+Start the frontend in a second terminal:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Vite proxies `/api` requests to `http://localhost:8080`. The console provides Dashboard, Source Runs, Data Quality, and Serving Data views. It reads historical behavior directly from the database and never hard-codes demonstration run IDs.
+
+## Real-data demo flow
+
+1. Start PostgreSQL and the backend using the local setup commands.
+2. Start the frontend and open <http://localhost:5173>.
+3. Use Dashboard to compare the latest ingestion and publication state for both sources.
+4. Open Source Runs to inspect HTTP-200 upstream failures and their preserved snapshot metadata.
+5. Open Data Quality to compare historical policy decisions and their immutable issue evidence.
+6. Open Serving Data to view the current FSS products and Seoul policy-linked execution statistics.
+
+## Dashboard screenshots
+
+Add final portfolio screenshots here after running the console with the verified local real-data database.
+
 ## Verification
 
 Run the complete test suite. The integration tests start real PostgreSQL 17.11 containers, use WireMock for deterministic HTTP behavior, and do not use H2 or real API credentials:
 
 ```bash
-./gradlew test
+./gradlew test --rerun-tasks --no-daemon
+cd frontend
+npm install
+npm run typecheck
+npm run build
 ```
 
 With the application running, verify Actuator health and OpenAPI:
@@ -172,4 +240,4 @@ docker compose --env-file .env down --volumes
 
 ## Current phase boundary
 
-Phase 4 includes the Phase 1–3 capabilities plus deterministic data-quality issues, quarantine references, publication history, serving pointers, last-valid-serving protection, atomic promotion, deterministic ADDED/UPDATED changes, and NO_CHANGE handling. It does not include automatic or manual retry, scheduling, authentication, authorization, operator audit logs, quality overrides, issue-resolution workflows, notifications, frontend, or AI features.
+Phase 5 adds only read-only operational APIs and the React console over the verified Phase 1–4.1 lifecycle. It does not add ingestion, normalization, quality, or publication writes; retry, scheduling, authentication, authorization, operator mutation workflows, overrides, notifications, distributed infrastructure, or AI features.

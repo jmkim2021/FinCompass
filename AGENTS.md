@@ -51,3 +51,16 @@ Phase 4 contains the Phase 1–3 capabilities plus deterministic quality validat
 - Compare explicit business fields only. Provenance-only changes produce `NO_CHANGE` and must not rewrite serving pointers.
 - Do not infer removal when complete-snapshot absence semantics are uncertain.
 - Do not add retries, scheduling, authentication, authorization, operator audit, overrides, issue workflows, notifications, frontend, or AI features until a later phase explicitly approves them.
+
+## Phase 5 boundary
+
+Phase 5 exposes the verified lifecycle through read-only APIs and a minimal React operations console.
+
+- Keep every `/api/v1` endpoint read-only and do not expose workflow mutations.
+- Map database data into dedicated response DTOs; never serialize JPA entities or lazy proxies.
+- Never expose API keys, authenticated source URLs, or complete raw payloads.
+- Read current product and observation data through serving pointers rather than historical normalized tables.
+- Preserve deterministic ordering and bounded pagination for operational history.
+- Describe Seoul data as policy-linked commercial-bank loan execution statistics, not generic market rates.
+- Keep local CORS origins explicit and never enable wildcard production CORS.
+- Do not add authentication, retries, scheduling, notifications, distributed infrastructure, or AI features in this phase.

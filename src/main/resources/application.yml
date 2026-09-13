@@ -19,6 +19,8 @@ spring:
     locations: classpath:db/migration
 
 loanops:
+  api:
+    allowed-origins: ${LOANOPS_API_ALLOWED_ORIGINS:http://localhost:5173}
   sources:
     fss-finlife:
       base-url: ${FSS_API_BASE_URL:}
