@@ -46,6 +46,8 @@ Phase 4 contains the Phase 1–3 capabilities plus deterministic quality validat
 - Keep ingestion success, normalization, quality acceptance, and publication as separate lifecycle concepts.
 - Persist quality evidence before rejecting publication. Quarantine references invalid normalized history; it never deletes or duplicates it.
 - Promote a selected source run as one atomic unit. Any quality issue blocks every serving pointer from that run and preserves the last valid serving state.
+- Validate FSS term rates as individually non-negative with `minimum_rate <= maximum_rate`; do not assume its optional average is bounded by those values. Keep Seoul's `minimum <= average <= maximum` rule.
+- Record the quality policy version used for every final publication decision and never recalculate historical decisions in place.
 - Compare explicit business fields only. Provenance-only changes produce `NO_CHANGE` and must not rewrite serving pointers.
 - Do not infer removal when complete-snapshot absence semantics are uncertain.
 - Do not add retries, scheduling, authentication, authorization, operator audit, overrides, issue workflows, notifications, frontend, or AI features until a later phase explicitly approves them.

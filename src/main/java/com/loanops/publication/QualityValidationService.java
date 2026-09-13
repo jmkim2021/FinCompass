@@ -144,11 +144,10 @@ public class QualityValidationService {
         nonNegative(issues, "minimum_rate", term.getMinimumRate());
         nonNegative(issues, "maximum_rate", term.getMaximumRate());
         nonNegative(issues, "average_rate", term.getAverageRate());
-        orderedRates(
+        orderedMinimumAndMaximum(
                 issues,
                 "rate",
                 term.getMinimumRate(),
-                term.getAverageRate(),
                 term.getMaximumRate()
         );
         return issues;
@@ -252,6 +251,24 @@ public class QualityValidationService {
                     "Rates must satisfy minimum <= average <= maximum when average is present"
             ));
         }
+    }
+
+    private void orderedMinimumAndMaximum(
+            List<IssueDraft> issues,
+            String fieldName,
+            BigDecimal minimum,
+            BigDecimal maximum
+    ) {
+        if (minimum == null || maximum == null || minimum.compareTo(maximum) <= 0) {
+            return;
+        }
+        String observed = "min=" + minimum.toPlainString() + ",max=" + maximum.toPlainString();
+        issues.add(new IssueDraft(
+                QualityRuleCode.INVALID_RATE_ORDER,
+                fieldName,
+                observed,
+                "Rates must satisfy minimum <= maximum"
+        ));
     }
 
     private void persistRecordIssues(

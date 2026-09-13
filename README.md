@@ -114,7 +114,7 @@ The selected run must be `SUCCESS`. For Seoul, every snapshot in the paginated r
 
 Source ingestion success, normalization, quality validation, and serving publication are separate lifecycle stages. A `SUCCESS` `SourceRun` remains successful even when its normalized records later fail quality validation.
 
-The deterministic quality rules check required source identities, valid date order, non-negative rates and counts, and rate ordering. Optional FSS average rates remain nullable. No arbitrary maximum-rate threshold, scoring, or heuristic rule is used.
+The deterministic quality rules check required source identities, valid date order, and non-negative rates and counts. For FSS terms, minimum, maximum, and optional average rates must each be non-negative, while ordering requires only `minimum_rate <= maximum_rate`; the official response contract does not establish that the reported average uses the same basis as those bounds. Seoul observations retain `minimum <= average <= maximum` validation. No arbitrary maximum-rate threshold, scoring, or heuristic rule is used. Publication decisions record quality policy version `2026-09-v2`; pre-existing Phase 4 decisions are retained as `2026-09-v1` history.
 
 Each violation is stored as a `DataQualityIssue`. An invalid normalized record also receives one `QuarantineRecord`, regardless of how many issues it has. Quarantine means that the immutable normalized record was rejected from serving; it does not delete or duplicate the normalized data.
 

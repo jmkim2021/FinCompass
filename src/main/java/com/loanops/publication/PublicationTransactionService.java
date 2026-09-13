@@ -84,7 +84,8 @@ public class PublicationTransactionService {
         return publicationRunRepository.save(new PublicationRun(
                 sourceRun,
                 PublicationStatus.REJECTED_QUALITY,
-                Instant.now()
+                Instant.now(),
+                QualityPolicy.CURRENT_VERSION
         ));
     }
 
@@ -108,7 +109,7 @@ public class PublicationTransactionService {
                 ? PublicationStatus.NO_CHANGE
                 : PublicationStatus.PROMOTED;
         PublicationRun publicationRun = publicationRunRepository.save(
-                new PublicationRun(sourceRun, status, now)
+                new PublicationRun(sourceRun, status, now, QualityPolicy.CURRENT_VERSION)
         );
         for (ChangeDraft change : changes) {
             dataChangeRepository.save(new DataChange(

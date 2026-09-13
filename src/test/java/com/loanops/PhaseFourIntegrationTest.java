@@ -145,6 +145,11 @@ class PhaseFourIntegrationTest {
         assertThat(servingProductRepository.count()).isEqualTo(1);
         assertThat(servingTermRepository.count()).isEqualTo(2);
         assertThat(jdbcTemplate.queryForObject(
+                "SELECT quality_policy_version FROM loanops.publication_runs WHERE source_run_id = ?",
+                String.class,
+                sourceRunId
+        )).isEqualTo("2026-09-v2");
+        assertThat(jdbcTemplate.queryForObject(
                 """
                         SELECT COUNT(*)
                         FROM loanops.serving_loan_products serving
@@ -185,18 +190,70 @@ class PhaseFourIntegrationTest {
     }
 
     @Test
-    void invalidFssRateOrderIsQuarantinedAndRejected() throws Exception {
-        long sourceRunId = ingestAndNormalizeFss(fssPayload());
+    void fssAverageOutsideMinimumAndMaximumIsAccepted() throws Exception {
+        String payload = fssPayload()
+                .replace("\"lend_rate_min\": \"5.33\"", "\"lend_rate_min\": \"4.50\"")
+                .replace("\"lend_rate_avg\": \"4.97\"", "\"lend_rate_avg\": \"4.20\"")
+                .replace("\"lend_rate_max\": \"6.53\"", "\"lend_rate_max\": \"5.50\"");
+        long sourceRunId = ingestAndNormalizeFss(payload);
+
+        PublicationResult result = publicationService.publish(sourceRunId);
+
+        assertThat(result.status()).isEqualTo(PublicationStatus.PROMOTED);
+        assertThat(result.issueCount()).isZero();
+        assertThat(result.quarantineCount()).isZero();
+        assertThat(servingProductRepository.count()).isEqualTo(1);
+        assertThat(servingTermRepository.count()).isEqualTo(2);
+    }
+
+    @Test
+    void negativeFssRateIsQuarantinedAndRejected() throws Exception {
+        String payload = fssPayload()
+                .replace("\"lend_rate_min\": \"3.96\"", "\"lend_rate_min\": \"-1.00\"");
+        long sourceRunId = ingestAndNormalizeFss(payload);
 
         PublicationResult result = publicationService.publish(sourceRunId);
 
         assertThat(result.status()).isEqualTo(PublicationStatus.REJECTED_QUALITY);
-        assertThat(result.issueCount()).isEqualTo(1);
-        assertThat(result.quarantineCount()).isEqualTo(1);
         assertThat(issues(sourceRunId)).extracting(DataQualityIssue::getRuleCode)
-                .containsExactly(QualityRuleCode.INVALID_RATE_ORDER);
+                .containsExactly(QualityRuleCode.NEGATIVE_RATE);
+        assertThat(quarantineRepository.countBySourceRunId(sourceRunId)).isEqualTo(1);
         assertThat(servingProductRepository.count()).isZero();
         assertThat(servingTermRepository.count()).isZero();
+    }
+
+    @Test
+    void fssMinimumAboveMaximumIsQuarantinedAndRejected() throws Exception {
+        String payload = fssPayload()
+                .replace("\"lend_rate_min\": \"5.33\"", "\"lend_rate_min\": \"5.50\"")
+                .replace("\"lend_rate_max\": \"6.53\"", "\"lend_rate_max\": \"4.50\"");
+        long sourceRunId = ingestAndNormalizeFss(payload);
+
+        PublicationResult result = publicationService.publish(sourceRunId);
+
+        assertThat(result.status()).isEqualTo(PublicationStatus.REJECTED_QUALITY);
+        assertThat(issues(sourceRunId)).extracting(DataQualityIssue::getRuleCode)
+                .containsExactly(QualityRuleCode.INVALID_RATE_ORDER);
+        assertThat(quarantineRepository.countBySourceRunId(sourceRunId)).isEqualTo(1);
+        assertThat(servingProductRepository.count()).isZero();
+        assertThat(servingTermRepository.count()).isZero();
+    }
+
+    @Test
+    void seoulAverageOutsideMinimumAndMaximumIsQuarantinedAndRejected() throws Exception {
+        String payload = seoulPayload()
+                .replace("<min_lo_ir>3.99</min_lo_ir>", "<min_lo_ir>4.00</min_lo_ir>")
+                .replace("<avg_lo_ir>4.69</avg_lo_ir>", "<avg_lo_ir>3.50</avg_lo_ir>")
+                .replace("<max_lo_ir>5.67</max_lo_ir>", "<max_lo_ir>5.00</max_lo_ir>");
+        long sourceRunId = ingestAndNormalizeSeoul(payload);
+
+        PublicationResult result = publicationService.publish(sourceRunId);
+
+        assertThat(result.status()).isEqualTo(PublicationStatus.REJECTED_QUALITY);
+        assertThat(issues(sourceRunId)).extracting(DataQualityIssue::getRuleCode)
+                .containsExactly(QualityRuleCode.INVALID_RATE_ORDER);
+        assertThat(quarantineRepository.countBySourceRunId(sourceRunId)).isEqualTo(1);
+        assertThat(servingObservationRepository.count()).isZero();
     }
 
     @Test
@@ -453,6 +510,20 @@ class PhaseFourIntegrationTest {
                 "SELECT success FROM loanops.flyway_schema_history WHERE version = '6'",
                 Boolean.class
         )).isTrue();
+        assertThat(jdbcTemplate.queryForObject(
+                "SELECT success FROM loanops.flyway_schema_history WHERE version = '7'",
+                Boolean.class
+        )).isTrue();
+        assertThat(jdbcTemplate.queryForObject(
+                """
+                        SELECT is_nullable
+                        FROM information_schema.columns
+                        WHERE table_schema = 'loanops'
+                          AND table_name = 'publication_runs'
+                          AND column_name = 'quality_policy_version'
+                        """,
+                String.class
+        )).isEqualTo("NO");
     }
 
     private long ingestAndNormalizeFss(String payload) {

@@ -38,14 +38,23 @@ public class PublicationRun {
     @Column(name = "completed_at", nullable = false, updatable = false)
     private Instant completedAt;
 
+    @Column(name = "quality_policy_version", nullable = false, length = 32, updatable = false)
+    private String qualityPolicyVersion;
+
     protected PublicationRun() {
     }
 
-    public PublicationRun(SourceRun sourceRun, PublicationStatus status, Instant now) {
+    public PublicationRun(
+            SourceRun sourceRun,
+            PublicationStatus status,
+            Instant now,
+            String qualityPolicyVersion
+    ) {
         this.sourceRun = Objects.requireNonNull(sourceRun);
         this.status = Objects.requireNonNull(status);
         this.createdAt = Objects.requireNonNull(now);
         this.completedAt = now;
+        this.qualityPolicyVersion = Objects.requireNonNull(qualityPolicyVersion);
     }
 
     public Long getId() { return id; }
@@ -53,4 +62,5 @@ public class PublicationRun {
     public PublicationStatus getStatus() { return status; }
     public Instant getCreatedAt() { return createdAt; }
     public Instant getCompletedAt() { return completedAt; }
+    public String getQualityPolicyVersion() { return qualityPolicyVersion; }
 }
