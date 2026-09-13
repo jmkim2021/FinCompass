@@ -32,8 +32,7 @@ loanops:
       base-url: ${SEOUL_API_BASE_URL:}
       service-name: ${SEOUL_API_SERVICE_NAME:}
       api-key: ${SEOUL_API_KEY:}
-      start-index: ${SEOUL_API_START_INDEX:1}
-      end-index: ${SEOUL_API_END_INDEX:1000}
+      page-size: ${SEOUL_API_PAGE_SIZE:5}
       connect-timeout: ${SEOUL_API_CONNECT_TIMEOUT:2s}
       read-timeout: ${SEOUL_API_READ_TIMEOUT:5s}
 

@@ -92,7 +92,15 @@ class SourceIngestionIntegrationTest {
     @BeforeEach
     void resetState() {
         WIRE_MOCK.resetAll();
-        jdbcTemplate.execute("TRUNCATE TABLE loanops.raw_snapshots, loanops.source_runs RESTART IDENTITY");
+        jdbcTemplate.execute("""
+                TRUNCATE TABLE
+                    loanops.loan_rate_observations,
+                    loanops.product_terms,
+                    loanops.loan_products,
+                    loanops.raw_snapshots,
+                    loanops.source_runs
+                RESTART IDENTITY
+                """);
     }
 
     @AfterAll
@@ -126,7 +134,7 @@ class SourceIngestionIntegrationTest {
     @Test
     void seoulSuccessPreservesExactXmlAndHash() throws Exception {
         String payload = fixture("fixtures/seoul/policy-loan-rates.xml");
-        WIRE_MOCK.stubFor(get(urlPathEqualTo("/" + TEST_API_KEY + "/xml/dreamMoney/1/1000"))
+        WIRE_MOCK.stubFor(get(urlPathEqualTo("/" + TEST_API_KEY + "/xml/dreamMoney/1/5"))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/xml;charset=UTF-8")
@@ -145,7 +153,7 @@ class SourceIngestionIntegrationTest {
     @Test
     void seoulHttp200UpstreamErrorPreservesRawSnapshotAndPersistsFailedRun() throws Exception {
         String payload = fixture("fixtures/seoul/upstream-error.xml");
-        WIRE_MOCK.stubFor(get(urlPathEqualTo("/" + TEST_API_KEY + "/xml/dreamMoney/1/1000"))
+        WIRE_MOCK.stubFor(get(urlPathEqualTo("/" + TEST_API_KEY + "/xml/dreamMoney/1/5"))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/xml;charset=UTF-8")
@@ -249,7 +257,7 @@ class SourceIngestionIntegrationTest {
     @Test
     void runningRunIsQueryableWhileExternalCallIsInProgress() throws Exception {
         String payload = fixture("fixtures/seoul/policy-loan-rates.xml");
-        WIRE_MOCK.stubFor(get(urlPathEqualTo("/" + TEST_API_KEY + "/xml/dreamMoney/1/1000"))
+        WIRE_MOCK.stubFor(get(urlPathEqualTo("/" + TEST_API_KEY + "/xml/dreamMoney/1/5"))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/xml")

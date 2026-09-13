@@ -35,6 +35,12 @@
 - Use deterministic tests and explicit assertions for data integrity, provenance, failure handling, and serving isolation when those capabilities are introduced.
 - Keep test fixtures and fault-injection data out of production data tables.
 
-## Phase 2 boundary
+## Phase 3 boundary
 
-Phase 2 contains the Phase 1 foundation plus `DataSource`, `SourceRun`, `RawSnapshot`, minimal FSS and Seoul adapters, explicit source-run lifecycle transactions, raw-payload hashing, and profile-gated manual ingestion. Do not add financial-domain normalization, institution matching, quality rules, quarantine, serving tables, change detection, retry behavior, scheduling, security, audit, frontend, or AI features in this phase.
+Phase 3 contains the Phase 1 foundation and Phase 2 source lifecycle plus safe Seoul pagination, source-specific parsing, `FinancialInstitution`, `InstitutionAlias`, FSS `LoanProduct` and `ProductTerm`, Seoul `LoanRateObservation`, explicit provenance, idempotent normalization, and profile-gated manual normalization.
+
+- Keep FSS product conditions and Seoul aggregate execution statistics semantically separate. Never link a Seoul observation directly to an FSS product.
+- Resolve institutions only by exact source identity or an explicit confirmed cross-source mapping. Retain uncertain source identities and records as `UNMAPPED`.
+- Every product, term, and observation must reference its exact raw snapshot.
+- Treat one normalization invocation as an atomic unit and reject incomplete or malformed source data without partial writes.
+- Do not add quality scoring, quarantine, serving tables, serving promotion, change detection, retries, scheduling, security, audit, frontend, or AI features until a later phase explicitly approves them.

@@ -1,6 +1,7 @@
 package com.loanops.source.service;
 
 import com.loanops.source.client.RawSourceResponse;
+import com.loanops.source.client.SeoulLoanRateAdapter;
 import com.loanops.source.client.SourceAdapter;
 import com.loanops.source.client.SourceResponseValidation;
 import com.loanops.source.domain.DataSourceCode;
@@ -32,13 +33,107 @@ public class SourceIngestionService {
         SourceAdapter adapter = findAdapter(sourceCode);
         long sourceRunId = lifecycleService.start(sourceCode);
 
-        RawSourceResponse response;
+        if (adapter instanceof SeoulLoanRateAdapter seoulAdapter) {
+            return ingestSeoul(sourceRunId, sourceCode, seoulAdapter);
+        }
+
+        RawSourceResponse response = fetch(sourceRunId, sourceCode, adapter::fetch);
+        String payloadHash = preserveAndValidate(sourceRunId, sourceCode, adapter, response);
+        completeSuccess(sourceRunId, sourceCode, response.httpStatus());
+        return new IngestionResult(sourceRunId, sourceCode, response.httpStatus(), payloadHash, 1);
+    }
+
+    private IngestionResult ingestSeoul(
+            long sourceRunId,
+            DataSourceCode sourceCode,
+            SeoulLoanRateAdapter adapter
+    ) {
+        int pageSize = adapter.pageSize();
+        int startIndex = 1;
+        int endIndex = pageSize;
+        int snapshotCount = 0;
+        int firstStart = startIndex;
+        int firstEnd = endIndex;
+
+        RawSourceResponse response = fetch(
+                sourceRunId,
+                sourceCode,
+                () -> adapter.fetchPage(firstStart, firstEnd)
+        );
+        String payloadHash = preserveAndValidate(sourceRunId, sourceCode, adapter, response);
+        snapshotCount++;
+
+        int totalCount;
         try {
-            response = adapter.fetch();
+            totalCount = adapter.totalCount(response);
+            requireExpectedRows(adapter, response, Math.min(pageSize, totalCount));
+        } catch (RuntimeException exception) {
+            throw persistFailure(
+                    sourceRunId,
+                    sourceCode,
+                    new SourceFailure(
+                            SourceRunErrorType.UPSTREAM_ERROR,
+                            "Seoul response contains invalid pagination metadata",
+                            response.httpStatus()
+                    )
+            );
+        }
+
+        for (startIndex = pageSize + 1; startIndex <= totalCount; startIndex += pageSize) {
+            endIndex = Math.min(startIndex + pageSize - 1, totalCount);
+            int pageStart = startIndex;
+            int pageEnd = endIndex;
+            response = fetch(
+                    sourceRunId,
+                    sourceCode,
+                    () -> adapter.fetchPage(pageStart, pageEnd)
+            );
+            payloadHash = preserveAndValidate(sourceRunId, sourceCode, adapter, response);
+            snapshotCount++;
+            try {
+                requireExpectedRows(adapter, response, pageEnd - pageStart + 1);
+            } catch (RuntimeException exception) {
+                throw persistFailure(
+                        sourceRunId,
+                        sourceCode,
+                        new SourceFailure(
+                                SourceRunErrorType.UPSTREAM_ERROR,
+                                "Seoul response contains an unexpected row count",
+                                response.httpStatus()
+                        )
+                );
+            }
+        }
+
+        completeSuccess(sourceRunId, sourceCode, response.httpStatus());
+        return new IngestionResult(
+                sourceRunId,
+                sourceCode,
+                response.httpStatus(),
+                payloadHash,
+                snapshotCount
+        );
+    }
+
+    private RawSourceResponse fetch(
+            long sourceRunId,
+            DataSourceCode sourceCode,
+            ResponseSupplier responseSupplier
+    ) {
+
+        try {
+            return responseSupplier.get();
         } catch (RuntimeException exception) {
             throw persistFailure(sourceRunId, sourceCode, errorClassifier.classify(exception));
         }
+    }
 
+    private String preserveAndValidate(
+            long sourceRunId,
+            DataSourceCode sourceCode,
+            SourceAdapter adapter,
+            RawSourceResponse response
+    ) {
         String payloadHash;
         try {
             payloadHash = lifecycleService.preserveRawSnapshot(sourceRunId, response);
@@ -49,6 +144,18 @@ public class SourceIngestionService {
                     response.httpStatus()
             );
             throw persistFailure(sourceRunId, sourceCode, failure);
+        }
+
+        if (response.httpStatus() < 200 || response.httpStatus() > 299) {
+            throw persistFailure(
+                    sourceRunId,
+                    sourceCode,
+                    new SourceFailure(
+                            SourceRunErrorType.HTTP_ERROR,
+                            "External API returned HTTP status " + response.httpStatus(),
+                            response.httpStatus()
+                    )
+            );
         }
 
         SourceResponseValidation validation;
@@ -69,16 +176,25 @@ public class SourceIngestionService {
             );
         }
 
+        return payloadHash;
+    }
+
+    private void completeSuccess(long sourceRunId, DataSourceCode sourceCode, int httpStatus) {
         try {
-            lifecycleService.completeSuccess(sourceRunId, response.httpStatus());
-            return new IngestionResult(sourceRunId, sourceCode, response.httpStatus(), payloadHash);
+            lifecycleService.completeSuccess(sourceRunId, httpStatus);
         } catch (RuntimeException exception) {
             SourceFailure failure = new SourceFailure(
                     SourceRunErrorType.UNKNOWN_ERROR,
                     "Successful source response could not be completed",
-                    response.httpStatus()
+                    httpStatus
             );
             throw persistFailure(sourceRunId, sourceCode, failure);
+        }
+    }
+
+    private void requireExpectedRows(SeoulLoanRateAdapter adapter, RawSourceResponse response, int expectedRows) {
+        if (adapter.rowCount(response) != expectedRows) {
+            throw new IllegalArgumentException("Unexpected Seoul row count");
         }
     }
 
@@ -123,5 +239,11 @@ public class SourceIngestionService {
             }
         }
         return Map.copyOf(indexed);
+    }
+
+    @FunctionalInterface
+    private interface ResponseSupplier {
+
+        RawSourceResponse get();
     }
 }

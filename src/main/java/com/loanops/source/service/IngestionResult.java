@@ -6,6 +6,7 @@ public record IngestionResult(
         long sourceRunId,
         DataSourceCode sourceCode,
         int httpStatus,
-        String payloadHash
+        String payloadHash,
+        int snapshotCount
 ) {
 }

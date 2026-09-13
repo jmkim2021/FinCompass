@@ -33,10 +33,11 @@ public class ManualIngestionConfiguration {
             try {
                 IngestionResult result = ingestionService.ingest(sourceCode);
                 logger.info(
-                        "Manual ingestion succeeded: source={}, runId={}, httpStatus={}, payloadHash={}",
+                        "Manual ingestion succeeded: source={}, runId={}, httpStatus={}, snapshots={}, payloadHash={}",
                         result.sourceCode(),
                         result.sourceRunId(),
                         result.httpStatus(),
+                        result.snapshotCount(),
                         result.payloadHash()
                 );
             } catch (SourceIngestionException exception) {

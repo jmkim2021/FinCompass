@@ -22,7 +22,7 @@ public class RawSnapshot {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "source_run_id", nullable = false, unique = true, updatable = false)
+    @JoinColumn(name = "source_run_id", nullable = false, updatable = false)
     private SourceRun sourceRun;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

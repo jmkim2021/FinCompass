@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<searchLoOrgIrList>
+  <list_total_count>6</list_total_count>
+  <RESULT><CODE>INFO-000</CODE><MESSAGE>정상 처리되었습니다.</MESSAGE></RESULT>
+  <row><lo_org_cd>B99</lo_org_cd><lo_org_nm>Unknown Test Bank</lo_org_nm><base_str_dt>20260613</base_str_dt><base_end_dt>20260912</base_end_dt><lo_cnt>1</lo_cnt><min_lo_ir>4.1</min_lo_ir><max_lo_ir>5.1</max_lo_ir><avg_lo_ir>not-a-decimal</avg_lo_ir><min_lo_ale_ir>1.8</min_lo_ale_ir><max_lo_ale_ir>2.5</max_lo_ale_ir><avg_lo_ale_ir>1.9</avg_lo_ale_ir></row>
+</searchLoOrgIrList>

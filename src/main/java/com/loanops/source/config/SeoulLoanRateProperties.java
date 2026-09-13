@@ -9,8 +9,7 @@ public record SeoulLoanRateProperties(
         String baseUrl,
         String serviceName,
         String apiKey,
-        int startIndex,
-        int endIndex,
+        int pageSize,
         Duration connectTimeout,
         Duration readTimeout
 ) {

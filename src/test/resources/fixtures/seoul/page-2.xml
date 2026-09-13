@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<searchLoOrgIrList>
+  <list_total_count>11</list_total_count>
+  <RESULT><CODE>INFO-000</CODE><MESSAGE>정상 처리되었습니다.</MESSAGE></RESULT>
+  <row><lo_org_cd>B08</lo_org_cd><lo_org_nm>기업은행</lo_org_nm><base_str_dt>20260613</base_str_dt><base_end_dt>20260912</base_end_dt><lo_cnt>552</lo_cnt><min_lo_ir>4.22</min_lo_ir><max_lo_ir>5.05</max_lo_ir><avg_lo_ir>4.67</avg_lo_ir><min_lo_ale_ir>1.8</min_lo_ale_ir><max_lo_ale_ir>2.5</max_lo_ale_ir><avg_lo_ale_ir>1.88</avg_lo_ale_ir></row>
+  <row><lo_org_cd>B09</lo_org_cd><lo_org_nm>하나은행</lo_org_nm><base_str_dt>20260613</base_str_dt><base_end_dt>20260912</base_end_dt><lo_cnt>3088</lo_cnt><min_lo_ir>4.31</min_lo_ir><max_lo_ir>5.22</max_lo_ir><avg_lo_ir>4.66</avg_lo_ir><min_lo_ale_ir>1.8</min_lo_ale_ir><max_lo_ale_ir>2.8</max_lo_ale_ir><avg_lo_ale_ir>1.92</avg_lo_ale_ir></row>
+  <row><lo_org_cd>B11</lo_org_cd><lo_org_nm>SC제일은행</lo_org_nm><base_str_dt>20260613</base_str_dt><base_end_dt>20260912</base_end_dt><lo_cnt>17</lo_cnt><min_lo_ir>4.51</min_lo_ir><max_lo_ir>5.03</max_lo_ir><avg_lo_ir>4.8</avg_lo_ir><min_lo_ale_ir>1.8</min_lo_ale_ir><max_lo_ale_ir>2.5</max_lo_ale_ir><avg_lo_ale_ir>1.92</avg_lo_ale_ir></row>
+  <row><lo_org_cd>B16</lo_org_cd><lo_org_nm>부산은행</lo_org_nm><base_str_dt>20260613</base_str_dt><base_end_dt>20260912</base_end_dt><lo_cnt>1</lo_cnt><min_lo_ir>4.52</min_lo_ir><max_lo_ir>4.52</max_lo_ir><avg_lo_ir>4.52</avg_lo_ir><min_lo_ale_ir>1.8</min_lo_ale_ir><max_lo_ale_ir>1.8</max_lo_ale_ir><avg_lo_ale_ir>1.8</avg_lo_ale_ir></row>
+  <row><lo_org_cd>B20</lo_org_cd><lo_org_nm>카카오뱅크</lo_org_nm><base_str_dt>20260613</base_str_dt><base_end_dt>20260912</base_end_dt><lo_cnt>1649</lo_cnt><min_lo_ir>4.41</min_lo_ir><max_lo_ir>5.03</max_lo_ir><avg_lo_ir>4.62</avg_lo_ir><min_lo_ale_ir>1.8</min_lo_ale_ir><max_lo_ale_ir>2.5</max_lo_ale_ir><avg_lo_ale_ir>1.87</avg_lo_ale_ir></row>
+</searchLoOrgIrList>
