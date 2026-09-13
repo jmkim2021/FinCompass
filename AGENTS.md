@@ -35,12 +35,17 @@
 - Use deterministic tests and explicit assertions for data integrity, provenance, failure handling, and serving isolation when those capabilities are introduced.
 - Keep test fixtures and fault-injection data out of production data tables.
 
-## Phase 3 boundary
+## Phase 4 boundary
 
-Phase 3 contains the Phase 1 foundation and Phase 2 source lifecycle plus safe Seoul pagination, source-specific parsing, `FinancialInstitution`, `InstitutionAlias`, FSS `LoanProduct` and `ProductTerm`, Seoul `LoanRateObservation`, explicit provenance, idempotent normalization, and profile-gated manual normalization.
+Phase 4 contains the Phase 1–3 capabilities plus deterministic quality validation, persisted quality issues, quarantine references, final publication results, serving pointers, last-valid-serving protection, atomic promotion, deterministic change records, and profile-gated manual publication.
 
 - Keep FSS product conditions and Seoul aggregate execution statistics semantically separate. Never link a Seoul observation directly to an FSS product.
 - Resolve institutions only by exact source identity or an explicit confirmed cross-source mapping. Retain uncertain source identities and records as `UNMAPPED`.
 - Every product, term, and observation must reference its exact raw snapshot.
 - Treat one normalization invocation as an atomic unit and reject incomplete or malformed source data without partial writes.
-- Do not add quality scoring, quarantine, serving tables, serving promotion, change detection, retries, scheduling, security, audit, frontend, or AI features until a later phase explicitly approves them.
+- Keep ingestion success, normalization, quality acceptance, and publication as separate lifecycle concepts.
+- Persist quality evidence before rejecting publication. Quarantine references invalid normalized history; it never deletes or duplicates it.
+- Promote a selected source run as one atomic unit. Any quality issue blocks every serving pointer from that run and preserves the last valid serving state.
+- Compare explicit business fields only. Provenance-only changes produce `NO_CHANGE` and must not rewrite serving pointers.
+- Do not infer removal when complete-snapshot absence semantics are uncertain.
+- Do not add retries, scheduling, authentication, authorization, operator audit, overrides, issue workflows, notifications, frontend, or AI features until a later phase explicitly approves them.

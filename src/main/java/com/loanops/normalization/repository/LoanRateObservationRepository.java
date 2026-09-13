@@ -4,6 +4,7 @@ import com.loanops.normalization.domain.LoanRateObservation;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public interface LoanRateObservationRepository extends JpaRepository<LoanRateObservation, Long> {
 
@@ -13,4 +14,6 @@ public interface LoanRateObservationRepository extends JpaRepository<LoanRateObs
             LocalDate referenceStartDate,
             LocalDate referenceEndDate
     );
+
+    List<LoanRateObservation> findAllByRawSnapshotSourceRunIdOrderByIdAsc(Long sourceRunId);
 }

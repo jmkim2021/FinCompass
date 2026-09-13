@@ -97,6 +97,13 @@ class PhaseThreeIntegrationTest {
         WIRE_MOCK.resetAll();
         jdbcTemplate.execute("""
                 TRUNCATE TABLE
+                    loanops.data_changes,
+                    loanops.serving_loan_rate_observations,
+                    loanops.serving_product_terms,
+                    loanops.serving_loan_products,
+                    loanops.publication_runs,
+                    loanops.quarantine_records,
+                    loanops.data_quality_issues,
                     loanops.loan_rate_observations,
                     loanops.product_terms,
                     loanops.loan_products,

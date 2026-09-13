@@ -1,6 +1,6 @@
 # LoanOps
 
-LoanOps is a financial public-data integration and operations platform focused on correctness, traceability, data integrity, and operational reliability. The current implementation includes the backend foundation, external-source execution and raw-response preservation, and Phase 3 source-specific normalization.
+LoanOps is a financial public-data integration and operations platform focused on correctness, traceability, data integrity, and operational reliability. The current implementation includes the backend foundation, external-source execution and raw-response preservation, source-specific normalization, and Phase 4 quality-controlled publication.
 
 ## Stack
 
@@ -110,6 +110,37 @@ set +a
 
 The selected run must be `SUCCESS`. For Seoul, every snapshot in the paginated run is parsed and validated together. Failed runs, incomplete page sets, malformed records, and inconsistent totals are rejected without a partial normalized commit.
 
+## Phase 4 quality and publication
+
+Source ingestion success, normalization, quality validation, and serving publication are separate lifecycle stages. A `SUCCESS` `SourceRun` remains successful even when its normalized records later fail quality validation.
+
+The deterministic quality rules check required source identities, valid date order, non-negative rates and counts, and rate ordering. Optional FSS average rates remain nullable. No arbitrary maximum-rate threshold, scoring, or heuristic rule is used.
+
+Each violation is stored as a `DataQualityIssue`. An invalid normalized record also receives one `QuarantineRecord`, regardless of how many issues it has. Quarantine means that the immutable normalized record was rejected from serving; it does not delete or duplicate the normalized data.
+
+The serving layer contains only stable identities and pointers to current normalized records:
+
+```text
+serving_loan_products -> loan_products -> raw_snapshots -> source_runs
+serving_product_terms -> product_terms -> raw_snapshots -> source_runs
+serving_loan_rate_observations -> loan_rate_observations -> raw_snapshots -> source_runs
+```
+
+Validation evidence is committed before publication. If any record in the selected source run is invalid, the publication result is `REJECTED_QUALITY` and no pointer from that run is promoted. Existing serving pointers remain unchanged. For valid runs, pointer changes and deterministic `DataChange` rows commit atomically.
+
+Business-identical normalized snapshots produce `NO_CHANGE`, create no `DataChange`, and do not rewrite serving pointers. `NO_CHANGE` belongs to `PublicationRun`; it does not alter `SourceRun.SUCCESS`. Change detection compares explicit normalized business fields and ignores provenance-only differences. `REMOVED` is not inferred because the current source completeness semantics are not sufficient for safe deletion from serving.
+
+Publication is disabled during normal startup. Process one normalized source run explicitly:
+
+```bash
+set -a
+source .env
+set +a
+./gradlew bootRun --args='--spring.profiles.active=manual-publication --loanops.manual.run-id=<SOURCE_RUN_ID>'
+```
+
+The command returns `PROMOTED`, `REJECTED_QUALITY`, or `NO_CHANGE` with sanitized issue, quarantine, and change counts. Re-running a finalized source run safely returns the existing publication result.
+
 ## Verification
 
 Run the complete test suite. The integration tests start real PostgreSQL 17.11 containers, use WireMock for deterministic HTTP behavior, and do not use H2 or real API credentials:
@@ -141,4 +172,4 @@ docker compose --env-file .env down --volumes
 
 ## Current phase boundary
 
-Phase 3 includes source definitions, source execution records, paginated exact raw snapshots, explicit failure persistence, source-specific parsing, explicit institution aliases, FSS products and terms, Seoul rate observations, provenance, idempotent normalization, and profile-gated manual commands. It does not include fuzzy matching, data-quality scoring, quarantine, serving promotion or current tables, change detection, retries, scheduling, authentication, authorization, audit logs, frontend, or AI features.
+Phase 4 includes the Phase 1–3 capabilities plus deterministic data-quality issues, quarantine references, publication history, serving pointers, last-valid-serving protection, atomic promotion, deterministic ADDED/UPDATED changes, and NO_CHANGE handling. It does not include automatic or manual retry, scheduling, authentication, authorization, operator audit logs, quality overrides, issue-resolution workflows, notifications, frontend, or AI features.
