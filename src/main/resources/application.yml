@@ -81,3 +81,5 @@ fincompass:
   data-quality:
     balance-stale-after: ${PERSONAL_BALANCE_STALE_AFTER:24h}
     policy-version: ${PERSONAL_DQ_POLICY_VERSION:personal-dq-v1}
+    income-evidence-stale-after: ${PERSONAL_INCOME_EVIDENCE_STALE_AFTER:180d}
+    max-income-year-age: ${PERSONAL_MAX_INCOME_YEAR_AGE:2}

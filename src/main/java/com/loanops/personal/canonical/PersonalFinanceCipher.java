@@ -10,15 +10,15 @@ public final class PersonalFinanceCipher {
     public PersonalFinanceCipher(SecretBox box,ObjectMapper json) {
         this.box=box;this.json=json.copy().enable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
-    String seal(String context,Object value) {
+    public String seal(String context,Object value) {
         try { return box.seal("personal:"+context,json.writeValueAsString(value)); }
         catch(Exception ex) { throw new PersonalFinanceException(STORAGE_ERROR); }
     }
-    <T> T open(String context,String value,Class<T> type) {
+    public <T> T open(String context,String value,Class<T> type) {
         try { return json.readValue(box.open("personal:"+context,value),type); }
         catch(Exception ex) { throw new PersonalFinanceException(STORAGE_ERROR); }
     }
-    String contentHash(Object value) {
+    public String contentHash(Object value) {
         try { return box.identity("personal-content-v1:"+json.writeValueAsString(value)); }
         catch(Exception ex) { throw new PersonalFinanceException(STORAGE_ERROR); }
     }

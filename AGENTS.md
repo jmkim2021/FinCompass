@@ -5,7 +5,7 @@
 - 이 파일은 FinCompass Agent 저장소 전체에 적용한다. 사용자에게 한국어로 보고한다.
 - 먼저 `docs/implementation/STATUS.md`, `BASELINE.md`, `PDF_REQUIREMENTS.md`를 읽는다.
 - 제품/아키텍처 source of truth는 `docs/FinCompass_Agent_Project_Plan.pdf` 전체 28쪽이다. 본문뿐 아니라 표/도표도 확인한다.
-- 현재 승인 범위는 Phase 2 Canonical Personal Finance + Data Quality까지이다. **Phase 3는 사용자 승인 전 시작하지 않는다.**
+- 현재 승인 범위는 Phase 3 Public MyData Mock + Provider Generalization까지이다. **Phase 4는 사용자 승인 전 시작하지 않는다.**
 - 승인된 phase만 구현한다. PDF/문서에 적힌 후속 기능은 현재 실행 허가가 아니다. 명시적 사용자 지시와 승인 범위를 우선한다.
 - `../Loanops`는 영구 read-only baseline이다. 그 안에서 편집·빌드·테스트·format·reset·commit을 하지 않는다.
 - 구현/문서 변경은 이 FinCompass 저장소에서만 한다. 원본 `.env`, token, DB volume, build cache를 복사하지 않는다.
@@ -56,7 +56,7 @@
 - 사용자/동의/연결 소유권을 검증한다. OAuth state·만료·refresh 실패를 처리한다. callback code와 token도 redaction 대상이다.
 - JPA entity 대신 dedicated DTO를 반환하고 기존 error envelope와 bounded deterministic pagination을 따른다. 새 POST의 CORS는 필요한 경로/origin만 허용한다.
 - 기존 Flyway migration은 수정하지 않는다. 새 migration은 해당 phase 승인 후 추가한다. H2 대신 PostgreSQL Testcontainers를 사용한다.
-- 현재 회귀 기준: backend 131개 (Phase 0 47개 + Phase 1 42개 + Phase 2 42개), frontend typecheck/build. frontend에 현재 자동 테스트 runner가 없다는 사실을 숨기지 않는다.
+- 현재 회귀 기준: backend 177개 (Phase 0 47개 + Phase 1 42개 + Phase 2 42개 + Phase 3 46개), frontend typecheck/build. frontend에 현재 자동 테스트 runner가 없다는 사실을 숨기지 않는다.
 - 새 기능은 mapping/pagination/dedupe/stale/promotion-block, metric/repayment/home/stress/compare golden, matching/missing-data/reproducibility, agent 숫자/trace/failure를 단계별 검증한다.
 - CI 핵심 테스트는 외부 LLM/API에 의존하지 않고 WireMock/fake model/명시적 fixture를 사용한다.
 - 매 phase: 관련 코드 조사 → 재사용/파일·schema·API 변경계획 → 구현 → 필요한 테스트 실행 → git diff 검토 → STATUS 갱신 → 변경·명령·실제 결과·한계·다음 단계 보고.

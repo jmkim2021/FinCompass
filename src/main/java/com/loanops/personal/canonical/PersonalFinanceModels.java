@@ -20,7 +20,7 @@ public final class PersonalFinanceModels {
     }
     public record Provenance(UUID id, UUID validationRunId, UUID sourceSyncRunId, UUID rawSnapshotId,
             SourceType sourceType, SourceMode sourceMode, Instant asOf, Instant collectedAt, Instant normalizedAt,
-            String endpoint, String responseHash, Integer rawRecordIndex) {
+            String endpoint, String responseHash, Integer rawRecordIndex, UUID providerEvidenceId, UUID consentGrantId) {
         @Override public String toString() { return "Provenance[REDACTED]"; }
     }
     public record FinancialAccount(UUID id, UUID userId, String sourceAccountKey, String institution,
@@ -61,8 +61,13 @@ public final class PersonalFinanceModels {
         @Override public String toString() { return "InvestmentPosition[REDACTED]"; }
     }
     public record IncomeEvidence(UUID id, UUID userId, BigDecimal verifiedAnnualIncome, Integer incomeYear,
-            String employmentStatus, String evidenceType, Instant asOf, UUID provenanceId) {
+            EmploymentStatus employmentStatus, EvidenceType evidenceType, Instant asOf, UUID provenanceId,
+            String currency, SourceType sourceType, SourceMode sourceMode, UUID providerEvidenceId, UUID consentGrantId, Instant collectedAt, Instant normalizedAt) {
         @Override public String toString() { return "IncomeEvidence[REDACTED]"; }
+    }
+    public record IncomeView(CurrentState state, List<IncomeEvidence> evidence) {
+        public IncomeView { evidence=List.copyOf(evidence); }
+        @Override public String toString() { return "IncomeView[state="+state.effectiveState()+", count="+evidence.size()+"]"; }
     }
     public record QualityIssue(UUID id, UUID validationRunId, RuleCode rule, Severity severity, Instant detectedAt,
             UUID sourceSyncRunId, String affectedEntity, String details, Resolution resolution) {

@@ -10,6 +10,7 @@ public interface PersonalFinanceProvider {
     ProviderCode code();
     SourceConnection connection(UUID connectionId, String owner);
     SourceBatch read(UUID runId, String owner);
+    default Set<Capability> consentScopes() { return Set.of(Capability.BALANCE,Capability.TRANSACTIONS); }
 
     record SourceConnection(UUID id, SourceMode mode, Instant consentUntil) {
         @Override public String toString() { return "SourceConnection[REDACTED]"; }
@@ -28,12 +29,22 @@ public interface PersonalFinanceProvider {
             String currency, Evidence evidence) {
         @Override public String toString() { return "TransactionObservation[REDACTED]"; }
     }
+    record IncomeObservation(BigDecimal annualIncome,Integer incomeYear,EmploymentStatus employmentStatus,
+            EvidenceType evidenceType,String currency,Evidence evidence) {
+        @Override public String toString() { return "IncomeObservation[REDACTED]"; }
+    }
     record SourceBatch(UUID runId, UUID connectionId, SourceType sourceType, SourceMode sourceMode, Capability capability,
             String sourceStatus, boolean complete, String sourceError, LocalDate from, LocalDate through,
             Instant startedAt, Instant completedAt, int duplicateCount, Set<Capability> supported,
             AccountObservation account, BalanceObservation balance, List<TransactionObservation> transactions,
-            boolean mappingValid) {
-        public SourceBatch { supported=Set.copyOf(supported); transactions=List.copyOf(transactions); }
+            boolean mappingValid,List<IncomeObservation> incomes) {
+        public SourceBatch(UUID runId, UUID connectionId, SourceType sourceType, SourceMode sourceMode, Capability capability,
+            String sourceStatus, boolean complete, String sourceError, LocalDate from, LocalDate through,
+            Instant startedAt, Instant completedAt, int duplicateCount, Set<Capability> supported,
+            AccountObservation account, BalanceObservation balance, List<TransactionObservation> transactions, boolean mappingValid) {
+            this(runId,connectionId,sourceType,sourceMode,capability,sourceStatus,complete,sourceError,from,through,startedAt,completedAt,duplicateCount,supported,account,balance,transactions,mappingValid,List.of());
+        }
+        public SourceBatch { supported=Set.copyOf(supported); transactions=List.copyOf(transactions); incomes=List.copyOf(incomes); }
         @Override public String toString() { return "SourceBatch[capability="+capability+", complete="+complete+"]"; }
     }
 }

@@ -4,39 +4,30 @@
 
 ## 현재 상태
 
-**Phase 2 Canonical Personal Finance + Data Quality 구현 완료. Backend 131/131, frontend typecheck/build, 실제 JAR replay 검증 완료. Phase 3는 미착수이며 별도 승인 대기.**
+**Phase 3 Public MyData Mock + Provider Generalization 구현 완료. Backend 177/177, frontend typecheck/build, 실제 통합 JAR replay 검증 완료. Phase 4 미착수, 사용자 승인 대기.**
 
-- 사용자 승인에 따라 Phase 1 `0a2fdb2`를 origin/phase/01-open-banking에 push하고, main을 fast-forward한 후 origin/main에 push했다. Phase 0 `c1d729d` 및 이전 history는 보존했다. force push 없음.
-- 현재 개발 branch는 `phase/02-personal-finance`. Phase 2 원격 push는 하지 않는다.
-- ../Loanops는 read-only. 기존 상품 pipeline/API/frontend/dependency 및 V1–V8은 보존한다.
-- 실제 KFTC 호출은 계속 **LIVE_TEST_NOT_VERIFIED**. 사용자 지시에 따라 credential 미준비는 이번 단계 blocker가 아니다.
+- Phase 2 `bc8a318`을 origin/phase/02-personal-finance에 push하고 main을 fast-forward한 후 origin/main에 push했다. force push/history rewrite 없음.
+- 현재 작업 branch: `phase/03-public-mydata`. Phase 3 원격 push는 하지 않는다.
+- ProviderLedger + V10으로 Open Banking-specific consent/run/raw FK coupling을 해결했다. 기존 legacy FK를 보존하며 PMD는 generic linkage만 사용한다.
+- PublicMyDataProvider/Mock 구현/Real 미래 interface, deterministic persona 3개, IncomeEvidence/Employment typed model, provider별 consent, provenance 및 stale/conflict/current 정책 구현.
+- 소득 증빙과 재직은 별도 scope/current이다. 소득은 PUBLIC_MYDATA_MOCK/DEMO_REPLAY이며 실제 정부 검증 소득으로 표현하지 않는다.
+- 같은 명시적 demo user에 Main persona와 기존 OB 1계좌/1잔액/28거래를 연결했다. PDF Golden Twin 숫자를 맞추기 위한 데이터를 추가하지 않았다.
+- 기존 상품 pipeline/API/frontend/dependency/V1–V9, ../Loanops read-only 보존. AI-Hub runtime provider/consumer API/UI/Financial Twin/계산/매칭/Agent 없음.
+- 실제 금융결제원은 LIVE_TEST_NOT_VERIFIED. 실제 Public MyData는 의도적으로 미연동이다.
 
-## Phase 2 결과
+## 문서 및 이전 기준
 
-- PersonalFinanceProvider와 Open Banking evidence adapter, canonical 11개 domain concept, 명시적 DEMO/DEVELOPER_TEST consent, 중앙 provenance 구현.
-- V9에서 16개 canonical/DQ/lineage/current table 추가. 실제 생성 대상은 계좌/잔액/거래이며 loan/card/investment/income rows는 만들지 않는다.
-- 6개 필수 DQ rule 및 안전한 current promotion 구현. incomplete/invalid/stale는 기존 정상 current를 대체하지 않는다. 최신 실패와 이전 정상 상태를 함께 노출한다.
-- stale 기본 24h, policy/threshold 저장, 조회 시 freshness 재평가. 거래 관측 identity는 Phase 1 HMAC 규칙 그대로 사용.
-- 서비스 API와 local manual replay profile만 추가. consumer HTTP API/UI, Financial Twin, Public MyData Mock, 계산/매칭/Agent는 구현하지 않았다.
-- 구현 계약·mapping·정밀도·NULL·consent·암호화·known limits·Phase 3 handoff: `PERSONAL_FINANCE_MODEL.md`.
-- 실제 backend/frontend/migration/replay/security/integrity 결과: `PHASE2_VALIDATION.md`.
+- Phase 3 구조/공식 자료 확인 범위/Mock 계약/동의/DQ/보안/한계/Phase 4 handoff: `PUBLIC_MYDATA.md`.
+- 실제 검증: `PHASE3_VALIDATION.md`.
+- Phase 2 모델: `PERSONAL_FINANCE_MODEL.md`의 Phase 3 갱신 기록을 함께 참조.
+- Phase 2 승인 baseline은 backend 131/131, frontend typecheck/build, replay canonical 1/1/28이다. 당시 검증은 `PHASE2_VALIDATION.md`에 유지한다.
+- Phase 1 공식 OB 계약/설정/키 정책은 `OPEN_BANKING.md`, 금리 단위는 `RATE_UNITS.md`를 유지한다.
 
-## 이전 검증과 남은 경계
+## 잔여 제약
 
-Phase 1은 backend 89/89(기존 47 + 신규 42), frontend typecheck/build, WireMock OAuth/refresh/balance/transaction/pagination/timeout/partial, 실제 replay JAR를 검증했다. 상세는 `PHASE1_VALIDATION.md`, 계약/설정은 `OPEN_BANKING.md`, 금리 단위는 `RATE_UNITS.md`에 보존한다.
-
-거래 composite identity는 은행 원장 ID가 아니다. 동일 관측값의 실거래 구별/정정/재연결/키 회전은 자동 해결하지 않는다. 계좌 metadata는 최초 관측에 고정된다. provider Java boundary와 별개로 현재 relational connection/evidence FK는 Open Banking에 묶여 있어 Phase 3에서 additive 확장이 필요하다.
-
-운영자 가명은 consumer 인증을 대체하지 않는다. canonical 동의 철회와 upstream OAuth 폐기는 별개이다. retention/파기/key rotation/crash recovery는 운영 부채로 남는다. 이 단계 완료는 개인정보 장기 운영 준비 완료를 뜻하지 않는다.
+실제 정부 API/전자서명/진위 검증 없음. 계좌 metadata 최초 관측 고정, 거래 correction/동일 관측값 ambiguity, key rotation, consumer 인증/retention/crash recovery는 운영 부채이다. 소득 current는 connection별이며 여러 연결의 소득 자동 결합/충돌 해소를 하지 않는다. 수집 후 미정규화 run은 명시적으로 normalize 재실행한다.
 
 ## 이후 구현 순서 — 승인 대기
-
-### Phase 3 - Public MyData Mock / 소득 evidence / offline fixture
-
-- 공식 묶음정보 계약 버전과 field mapping 작성. Mock provider와 evidence/consent 저장, PUBLIC_MYDATA_MOCK 고정.
-- verified annual income과 거래 기반 observed cashflow 분리. Real provider는 향후 교체 interface만.
-- 3개 통합 persona와 AI-Hub offline loader 경계 확정. AI-Hub를 runtime 동일 개인으로 합성하지 않음.
-- 완료: 소득 연도/asOf/출처 trace, mock 경계, 최소정보/동의 테스트.
 
 ### Phase 4 - Financial Twin와 Analytics
 
@@ -77,4 +68,4 @@ Phase 1은 backend 89/89(기존 47 + 신규 42), frontend typecheck/build, WireM
 
 ## 다음 승인 경계
 
-**Phase 3 Public MyData Mock / 소득 evidence / offline fixture는 시작하지 않았다. 사용자 승인 후에만 착수한다.**
+**Phase 4 Financial Twin / Analytics는 시작하지 않았다. 사용자 승인 후에만 착수한다.**

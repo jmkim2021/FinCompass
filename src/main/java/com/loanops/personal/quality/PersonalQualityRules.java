@@ -33,7 +33,7 @@ public final class PersonalQualityRules {
         if(batch.duplicateCount()>0) findings.add(new Finding(RuleCode.DUPLICATE_TRANSACTION,Severity.INFO,"TRANSACTIONS",
                 "SOURCE_DUPLICATE_COUNT="+batch.duplicateCount(),Resolution.RESOLVED));
         if(!hasVerifiedIncome) findings.add(new Finding(RuleCode.MISSING_INCOME_EVIDENCE,Severity.WARNING,"INCOME","NO_VERIFIED_ANNUAL_INCOME_EVIDENCE",Resolution.OPEN));
-        for(Capability c:Capability.values()) if(!batch.supported().contains(c)) findings.add(new Finding(RuleCode.SOURCE_CAPABILITY_MISSING,
+        for(Capability c:Capability.values()) if(c!=Capability.EMPLOYMENT&&!batch.supported().contains(c)) findings.add(new Finding(RuleCode.SOURCE_CAPABILITY_MISSING,
                 Severity.WARNING,c.name(),"PROVIDER_CAPABILITY_UNSUPPORTED",Resolution.OPEN));
         return new Assessment(state,findings);
     }

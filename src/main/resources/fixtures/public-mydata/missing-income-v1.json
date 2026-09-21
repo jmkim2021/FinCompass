@@ -1,0 +1,14 @@
+{
+  "contractVersion": "pmd-minimal-v1",
+  "fixtureId": "PMD-DEMO-003",
+  "evidence": [
+    {
+      "evidenceType": "EMPLOYMENT_ELIGIBILITY",
+      "verifiedAnnualIncome": null,
+      "incomeYear": null,
+      "employmentStatus": "UNKNOWN",
+      "currency": null,
+      "asOf": "2026-09-01T00:00:00Z"
+    }
+  ]
+}

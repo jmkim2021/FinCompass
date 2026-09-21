@@ -1,7 +1,7 @@
 # Canonical Personal Finance / Data Quality — Phase 2
 
 기준: 프로젝트 계획 PDF 28쪽 전체, 특히 p6의 product/personal 분리, p8 target domain, p10–11 canonical/DQ, p22 단계, p23 DoD. PDF SHA-256: `90733790831ed8deaa5607d3b45653f12404aa9e93056153a30d19aeee9bbf2b`.
-사용자 승인 범위는 Phase 2까지이며 Phase 3는 미구현이다. 실제 KFTC 호출 상태는 **LIVE_TEST_NOT_VERIFIED**이다.
+이 문서 본문은 Phase 2 기준 기록이다. Phase 3의 provider 일반화·소득 확장으로 바뀐 계약은 아래 갱신 기록과 `PUBLIC_MYDATA.md`를 우선한다. 현재 승인 범위는 Phase 3까지이다. 실제 KFTC 호출 상태는 **LIVE_TEST_NOT_VERIFIED**이다.
 
 ## 경계와 재사용
 
@@ -144,3 +144,12 @@ manual profile은 전용 local demo DB용이며 매번 새 합성 connection과 
 4. 현재 stale/partial/invalid/promotion/provenance/read API 계약과 기존 89개 regression을 유지한다. 금융 snapshot/analytics/Financial Twin은 Phase 4 경계로 남긴다.
 
 실제 실행 결과와 명령은 `PHASE2_VALIDATION.md`, 단계 상태는 `STATUS.md`에 기록한다.
+
+## Phase 3 갱신 기록 (2026-09-21)
+
+- V10에서 provider connection/run/evidence 공통 FK와 backfill을 추가했다. PMD는 OB FK를 필요로 하지 않는다. 기존 legacy FK는 OB 호환용으로 유지한다.
+- consent scope는 provider별 BALANCE/TRANSACTIONS와 INCOME/EMPLOYMENT로 분리한다.
+- IncomeEvidence는 typed EmploymentStatus/EvidenceType, currency, providerEvidenceId/consentGrantId/source/mode/시각을 추가했다. 소득과 재직은 별도 row/current이다.
+- 소득 모델이 항상 비어 있다는 Phase 2 설명은 이제 OB 단독에만 해당한다. PUBLIC_MYDATA_MOCK evidence는 명시적 demo consent로 채운다.
+- provenance 조회의 sourceSyncRunId는 공통 run ID이며 providerEvidenceId를 제공한다. OB UUID와 기존 raw 참조는 그대로 유지한다.
+- PUBLIC_MYDATA.md의 180d freshness/귀속연도/current/conflict/identity 정책을 따른다. Phase 4는 미착수이다.

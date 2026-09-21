@@ -24,7 +24,7 @@ class PersonalFinanceMigrationTest {
         jdbc.update("INSERT INTO loanops.open_banking_sync_checkpoints(connection_id,capability,successful_run_id,synced_at,mapped_ciphertext) VALUES (?,'BALANCE',?,now(),'synthetic-encrypted-balance')",connection,run);
         var before=jdbc.queryForList("SELECT * FROM loanops.raw_openbanking_snapshots");
         var checksums=jdbc.queryForList("SELECT version,checksum FROM loanops.flyway_schema_history WHERE version IS NOT NULL ORDER BY installed_rank");
-        var result=Flyway.configure().dataSource(dataSource).schemas("loanops").defaultSchema("loanops").load().migrate();
+        var result=Flyway.configure().dataSource(dataSource).schemas("loanops").defaultSchema("loanops").target("9").load().migrate();
         assertThat(result.migrationsExecuted).isEqualTo(1);
         assertThat(jdbc.queryForList("SELECT * FROM loanops.raw_openbanking_snapshots")).isEqualTo(before);
         assertThat(jdbc.queryForList("SELECT version,checksum FROM loanops.flyway_schema_history WHERE version::int<=8 ORDER BY installed_rank")).isEqualTo(checksums);
@@ -32,6 +32,6 @@ class PersonalFinanceMigrationTest {
         assertThat(jdbc.queryForObject("SELECT successful_run_id FROM loanops.open_banking_sync_checkpoints WHERE connection_id=?",UUID.class,connection)).isEqualTo(run);
         assertThat(jdbc.queryForObject("SELECT count(*) FROM loanops.financial_accounts",Integer.class)).isZero();
         assertThat(jdbc.queryForObject("SELECT count(*) FROM loanops.personal_validation_runs",Integer.class)).isZero();
-        assertThat(Flyway.configure().dataSource(dataSource).schemas("loanops").defaultSchema("loanops").load().migrate().migrationsExecuted).isZero();
+        assertThat(Flyway.configure().dataSource(dataSource).schemas("loanops").defaultSchema("loanops").target("9").load().migrate().migrationsExecuted).isZero();
     }
 }

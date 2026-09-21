@@ -1,0 +1,22 @@
+{
+  "contractVersion": "pmd-minimal-v1",
+  "fixtureId": "PMD-DEMO-001",
+  "evidence": [
+    {
+      "evidenceType": "INCOME_CERTIFICATE",
+      "verifiedAnnualIncome": "66000000",
+      "incomeYear": 2025,
+      "employmentStatus": null,
+      "currency": "KRW",
+      "asOf": "2026-09-01T00:00:00Z"
+    },
+    {
+      "evidenceType": "EMPLOYMENT_ELIGIBILITY",
+      "verifiedAnnualIncome": null,
+      "incomeYear": null,
+      "employmentStatus": "EMPLOYED",
+      "currency": null,
+      "asOf": "2026-09-01T00:00:00Z"
+    }
+  ]
+}
