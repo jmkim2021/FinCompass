@@ -1,6 +1,6 @@
 # FinCompass Agent - PDF 요구사항 및 아키텍처 매핑
 
-작성일: 2026-09-21 (Asia/Seoul). 상태: 분석 완료, 구현 미착수.
+작성일: 2026-09-21 (Asia/Seoul). 이 문서는 Phase 0 요구 추출과 당시 구현 전 mapping을 보존한다. “미구현/신규 필요” 표기는 그 시점의 gap이며 최종 상태는 `STATUS.md`, 실제 값은 `GOLDEN_RESULTS.md`가 우선한다.
 
 ## 기준 문서와 해석 원칙
 

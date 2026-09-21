@@ -1,7 +1,7 @@
 # Canonical Personal Finance / Data Quality — Phase 2
 
 기준: 프로젝트 계획 PDF 28쪽 전체, 특히 p6의 product/personal 분리, p8 target domain, p10–11 canonical/DQ, p22 단계, p23 DoD. PDF SHA-256: `90733790831ed8deaa5607d3b45653f12404aa9e93056153a30d19aeee9bbf2b`.
-이 문서 본문은 Phase 2 기준 기록이다. Phase 3의 provider 일반화·소득 확장으로 바뀐 계약은 아래 갱신 기록과 `PUBLIC_MYDATA.md`를 우선한다. 현재 승인 범위는 Phase 3까지이다. 실제 KFTC 호출 상태는 **LIVE_TEST_NOT_VERIFIED**이다.
+이 문서 본문은 Phase 2 당시 canonical 설계 기록이다. Phase 3의 provider 일반화·소득 확장은 아래 갱신 기록과 `PUBLIC_MYDATA.md`를 우선하며, Phase 4~10의 최종 소비자는 `FINANCIAL_TWIN.md`, `SIMULATION.md`, `AGENT.md`를 함께 따른다. 최종 구현은 V15까지 완료됐고 실제 KFTC 호출 상태는 계속 **LIVE_TEST_NOT_VERIFIED**이다.
 
 ## 경계와 재사용
 
@@ -116,7 +116,7 @@ loan_accounts/loan_payments/card_accounts/card_bills/investment_positions/income
 
 - 현재 계좌 metadata는 최초 canonical 관측에 고정된다. 거래를 먼저 정규화하면 accountType은 NULL로 남을 수 있다. 후속 계좌 metadata 변경의 versioning/승격은 아직 없다.
 - Java provider boundary는 중립적이지만 connection/sourceSyncRun/raw FK는 현재 Phase 1 Open Banking storage를 참조한다. Phase 3 provider 추가 시 provider-neutral evidence/connection persistence를 additive migration으로 확장해야 한다. 미래 provider가 코드 변경 없이 꽂힌다고 주장하지 않는다.
-- grant는 현재 balance/transactions scopes만 수용한다. INCOME 등의 scope, provider별 consent, income provenance/verification validation은 Phase 3 승인 후 확장한다.
+- Phase 2 당시 grant는 balance/transactions만 수용했다. Phase 3에서 INCOME/EMPLOYMENT, provider별 consent, income provenance/validation을 additive하게 확장했다.
 - 단일 연결의 동시 작업은 row lock으로 직렬화하며 대량 데이터 incremental batch 성능 최적화는 미구현이다. raw와 기존 거래 evidence를 요청 범위 단위로 메모리에 읽는다.
 - 실제 LIVE_TEST 호출은 미실시. endpoint/client/redirect/권한/테스트 계좌/기관 prefix/안정적인 key가 준비되어야 한다.
 - 운영 인증/인가, 보존·파기, 키 회전, crash RUNNING 복구는 기존 부채로 남는다. 개인정보 장기 운영 준비 완료 선언이 아니다.
@@ -141,7 +141,7 @@ manual profile은 전용 local demo DB용이며 매번 새 합성 connection과 
 1. PUBLIC_MYDATA_MOCK 계약/버전/필드와 persona를 확정하고 중립 connection/evidence reference를 확장한다. OB adapter를 재사용하는 척 데이터를 섞지 않는다.
 2. PersonalFinanceProvider에 별도 구현을 연결하고 provider별 scope/consent/명시적 MOCK 원산지를 보장한다.
 3. IncomeEvidence의 증빙 연도/asOf/verification 의미, LoanPayment explicit component 규칙을 provider ingest에 연결한다. 설명 기반 소득 추론은 금지한다.
-4. 현재 stale/partial/invalid/promotion/provenance/read API 계약과 기존 89개 regression을 유지한다. 금융 snapshot/analytics/Financial Twin은 Phase 4 경계로 남긴다.
+4. stale/partial/invalid/promotion/provenance/read API 계약은 이후에도 유지했다. Financial Snapshot/analytics는 Phase 4에서 별도 immutable layer로 구현했다.
 
 실제 실행 결과와 명령은 `PHASE2_VALIDATION.md`, 단계 상태는 `STATUS.md`에 기록한다.
 

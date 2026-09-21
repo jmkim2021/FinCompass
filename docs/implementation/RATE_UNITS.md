@@ -10,6 +10,6 @@
 - null/음수는 허용하지 않는다. 100% 초과 여부는 향후 상품/계산 정책에서 판단하므로 이 value object는 임의 상한을 넣지 않는다.
 - unit test에서 percent/fraction 양방향과 음수 거절을 실제 검증했다.
 
-현재 Phase 1에는 대출 계산 엔진이나 개인 canonical 금리 필드가 없다. 기존 상품 rate BigDecimal을 모두 이 타입으로 리팩터링하지 않았다. Phase 2 이후 소비자가 금리를 읽는 경계에서 source 단위를 확인하고 명시적으로 변환해야 한다.
+Phase 1 당시에는 대출 계산 엔진이나 개인 canonical 금리 필드가 없었다. 최종 구현에서 Simulation 입력과 stress delta는 decimal fraction(`0.045`=4.5%), 기존 LoanOps 상품 원천/표시는 percent number(`4.50`=4.5%)로 유지하며 Product Matching 경계에서 명시적으로 변환한다. 기존 상품 rate BigDecimal 전체를 일괄 리팩터링하지 않았다.
 
 PublicationRun을 전체 immutable catalogue version으로 해석하지 않는다. Phase 6에서 LoanProduct/ProductTerm/LoanRateObservation ID, source, observedAt, 실제 publication/run 참조를 함께 고정한다. 이번 phase는 해당 모델을 변경하지 않았다. PDF의 3.6억/4억/700M 예시를 하나의 fixture로 합치지 않았다.

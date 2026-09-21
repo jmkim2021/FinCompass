@@ -20,7 +20,7 @@ public final class AgentToolbox {
     public AgentToolbox(ObjectMapper json,FinancialTwinStore twins,ScenarioService scenarios,MatchService matches,ProductCatalogReader products,OpportunityService opportunities){this.json=json;this.twins=twins;this.scenarios=scenarios;this.matches=matches;this.products=products;this.opportunities=opportunities;}
     public Result execute(String owner,ToolName tool,ChatRequest request,Context context){return switch(tool){
         case GET_FINANCIAL_SNAPSHOT -> snapshot(owner,context);
-        case GET_CASHFLOW_ANALYSIS -> metricView(owner,context,"cashflow",List.of("OBSERVED_MONTHLY_INCOME","OBSERVED_MONTHLY_OUTFLOW","MONTHLY_FREE_CASHFLOW"));
+        case GET_CASHFLOW_ANALYSIS -> metricView(owner,context,"cashflow",List.of("OBSERVED_MONTHLY_INFLOW","OBSERVED_MONTHLY_OUTFLOW","MONTHLY_FREE_CASHFLOW"));
         case GET_DEBT_ANALYSIS -> metricView(owner,context,"debt",List.of("TOTAL_LIABILITIES","MONTHLY_DEBT_SERVICE","DEBT_SERVICE_BURDEN","DEBT_TO_ASSET"));
         case ESTIMATE_LOAN_CAPACITY -> envelope(owner,context);
         case SEARCH_LOAN_PRODUCTS -> result("products",products.read(),context);
@@ -30,7 +30,7 @@ public final class AgentToolbox {
         case MATCH_LOAN_PRODUCTS -> match(owner,request,context);
         case SIMULATE_PRODUCT_CANDIDATE -> candidate(owner,context,true);
         case COMPARE_PRODUCT_CANDIDATES -> candidate(owner,context,false);
-        case GET_OPPORTUNITY_EVENTS -> result("opportunities",opportunities.detect(owner),context);
+        case GET_OPPORTUNITY_EVENTS -> result("opportunities",opportunities.detect(owner,context.scenarioId,context.matchRunId),context);
         case GET_CALCULATION_TRACE -> calculationTrace(owner,context);
         case GET_PRODUCT_MATCH_TRACE -> result("productMatchTrace",matches.get(owner,required(context.matchRunId,"Match run required")),context);
     };}
