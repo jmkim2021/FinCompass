@@ -1,0 +1,116 @@
+{
+  "result": {
+    "err_cd": "000",
+    "err_msg": "정상",
+    "prdt_div": "M",
+    "total_count": "3",
+    "now_page_no": "1",
+    "max_page_no": "1",
+    "baseList": [
+      {
+        "dcls_month": "202608",
+        "fin_co_no": "0010001",
+        "kor_co_nm": "우리은행",
+        "fin_prdt_cd": "GOLDEN-A",
+        "fin_prdt_nm": "[합성 데모] 주택검토 A",
+        "join_way": "영업점",
+        "loan_inci_expn": "인지세",
+        "erly_rpay_fee": "중도상환수수료",
+        "dly_rate": "연체이율",
+        "loan_lmt": "담보 및 소득 심사 범위 내 (수치 한도 미공시)",
+        "dcls_strt_day": "20260820",
+        "dcls_end_day": "20270819",
+        "fin_co_subm_day": "202608181516"
+      },
+      {
+        "dcls_month": "202608",
+        "fin_co_no": "0010001",
+        "kor_co_nm": "우리은행",
+        "fin_prdt_cd": "GOLDEN-B",
+        "fin_prdt_nm": "[합성 데모] 주택검토 B",
+        "join_way": "영업점",
+        "loan_inci_expn": "인지세",
+        "erly_rpay_fee": "중도상환수수료",
+        "dly_rate": "연체이율",
+        "loan_lmt": "담보 및 소득 심사 범위 내 (수치 한도 미공시)",
+        "dcls_strt_day": "20260820",
+        "dcls_end_day": "20270819",
+        "fin_co_subm_day": "202608181516"
+      },
+      {
+        "dcls_month": "202608",
+        "fin_co_no": "0010001",
+        "kor_co_nm": "우리은행",
+        "fin_prdt_cd": "GOLDEN-C",
+        "fin_prdt_nm": "[합성 데모] 주택검토 C",
+        "join_way": "영업점",
+        "loan_inci_expn": "인지세",
+        "erly_rpay_fee": "중도상환수수료",
+        "dly_rate": "연체이율",
+        "loan_lmt": "담보 및 소득 심사 범위 내 (수치 한도 미공시)",
+        "dcls_strt_day": "20260820",
+        "dcls_end_day": "20270819",
+        "fin_co_subm_day": "202608181516"
+      }
+    ],
+    "optionList": [
+      {
+        "dcls_month": "202608",
+        "fin_co_no": "0010001",
+        "fin_prdt_cd": "GOLDEN-A",
+        "mrtg_type": "A",
+        "mrtg_type_nm": "아파트",
+        "rpay_type": "D",
+        "rpay_type_nm": "분할상환방식",
+        "lend_rate_type": "F",
+        "lend_rate_type_nm": "고정금리",
+        "lend_rate_min": "4.00",
+        "lend_rate_max": "5.20",
+        "lend_rate_avg": "4.50"
+      },
+      {
+        "dcls_month": "202608",
+        "fin_co_no": "0010001",
+        "fin_prdt_cd": "GOLDEN-A",
+        "mrtg_type": "A",
+        "mrtg_type_nm": "아파트",
+        "rpay_type": "S",
+        "rpay_type_nm": "만기일시상환방식",
+        "lend_rate_type": "C",
+        "lend_rate_type_nm": "변동금리",
+        "lend_rate_min": "3.60",
+        "lend_rate_max": "5.50",
+        "lend_rate_avg": null
+      },
+      {
+        "dcls_month": "202608",
+        "fin_co_no": "0010001",
+        "fin_prdt_cd": "GOLDEN-B",
+        "mrtg_type": "A",
+        "mrtg_type_nm": "아파트",
+        "rpay_type": "D",
+        "rpay_type_nm": "분할상환방식",
+        "lend_rate_type": "F",
+        "lend_rate_type_nm": "고정금리",
+        "lend_rate_min": "4.20",
+        "lend_rate_max": "5.80",
+        "lend_rate_avg": "4.60"
+      },
+      {
+        "dcls_month": "202608",
+        "fin_co_no": "0010001",
+        "fin_prdt_cd": "GOLDEN-C",
+        "mrtg_type": "A",
+        "mrtg_type_nm": "아파트",
+        "rpay_type": "D",
+        "rpay_type_nm": "분할상환방식",
+        "lend_rate_type": "C",
+        "lend_rate_type_nm": "변동금리",
+        "lend_rate_min": "4.60",
+        "lend_rate_max": "6.20",
+        "lend_rate_avg": "5.10"
+      }
+    ]
+  },
+  "fixture_origin": "SYNTHETIC_FINCOMPASS_PRODUCT_REPLAY_V1"
+}

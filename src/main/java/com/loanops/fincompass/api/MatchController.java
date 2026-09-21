@@ -1,0 +1,4 @@
+package com.loanops.fincompass.api;
+import com.loanops.fincompass.matching.*;import org.springframework.web.bind.annotation.*;import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;import java.util.*;import static com.loanops.fincompass.api.TwinController.DEMO_OWNER;import static com.loanops.fincompass.matching.MatchRecords.*;
+@RestController @RequestMapping("/api/v1/loan-product-matches") @ConditionalOnProperty(name="fincompass.demo.enabled",havingValue="true")
+public class MatchController {private final MatchService service;public MatchController(MatchService service){this.service=service;}@PostMapping public Run match(@RequestBody MatchRequest request){return service.match(DEMO_OWNER,request);}@GetMapping("/{id}")public Run get(@PathVariable UUID id){return service.get(DEMO_OWNER,id);}@GetMapping public List<Run> list(){return service.list(DEMO_OWNER);}}
