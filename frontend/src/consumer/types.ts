@@ -25,7 +25,7 @@ export interface FinancialSnapshot {
   calculationRuleVersion: string
   inputFingerprint: string
   input: { sourceRefs: SourceRef[]; warnings: string[] }
-  result: { metrics: Record<string, Metric>; warnings: string[]; limitations: string[]; verifiedAnnualIncome: number | null }
+  result: { metrics: Record<string, Metric>; warnings: string[]; limitations: string[]; verifiedAnnualIncome: number | null; monthlyLivingExpense: number | null; monthlyDebtService: number | null; monthlyFixedObligations: number | null; monthlyEssentialExpense: number | null }
   currentAssessment: { freshness: string; warnings: string[] }
 }
 
@@ -112,4 +112,19 @@ export interface AgentTrace {
   limitations: string[]
   toolCalls: Array<{ ordinal: number; toolName: string; status: string; paramsHash: string; resultHash: string | null }>
   finalExplanation: string
+}
+
+export interface TargetSearchResult {
+  feasible: boolean
+  maximumTestedFeasibleHousePrice: number | null
+  requiredMortgage: number | null
+  monthlyPayment: number | null
+  postPurchaseMonthlyFreeCashflow: number | null
+  emergencyFundMonths: number | null
+  debtServiceBurden: number | null
+  bindingConstraint: string
+  iterations: number
+  searchPrecision: number
+  ruleVersion: string
+  warnings: string[]
 }

@@ -12,7 +12,9 @@ export function formatRatio(value: number | null | undefined): string {
 
 export function metricText(metric: Metric | undefined): string {
   if (!metric || metric.availability !== 'AVAILABLE' || metric.value === null) return '확인 불가'
-  return metric.unit === 'RATIO' ? formatRatio(metric.value) : formatKrw(metric.value)
+  if (metric.unit === 'FRACTION') return formatRatio(metric.value)
+  if (metric.unit === 'MONTHS') return `${new Intl.NumberFormat('ko-KR', { maximumFractionDigits: 2 }).format(metric.value)}개월`
+  return formatKrw(metric.value)
 }
 
 export function humanize(value: string): string {
