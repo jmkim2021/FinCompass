@@ -55,3 +55,23 @@ springdoc:
   swagger-ui:
     enabled: true
     path: /swagger-ui.html
+
+fincompass:
+  open-banking:
+    enabled: ${OPEN_BANKING_ENABLED:false}
+    mode: ${OPEN_BANKING_MODE:DEMO_REPLAY}
+    base-url: ${OPEN_BANKING_BASE_URL:}
+    authorization-uri: ${OPEN_BANKING_AUTHORIZATION_URI:}
+    token-uri: ${OPEN_BANKING_TOKEN_URI:}
+    client-id: ${OPEN_BANKING_CLIENT_ID:}
+    client-secret: ${OPEN_BANKING_CLIENT_SECRET:}
+    redirect-uri: ${OPEN_BANKING_REDIRECT_URI:}
+    bank-tran-prefix: ${OPEN_BANKING_BANK_TRAN_PREFIX:}
+    encryption-key: ${OPEN_BANKING_ENCRYPTION_KEY:}
+    encryption-key-id: ${OPEN_BANKING_ENCRYPTION_KEY_ID:local-v1}
+    initial-lookback-days: ${OPEN_BANKING_INITIAL_LOOKBACK_DAYS:180}
+    overlap-days: ${OPEN_BANKING_OVERLAP_DAYS:3}
+    max-pages: ${OPEN_BANKING_MAX_PAGES:1000}
+    connect-timeout: ${OPEN_BANKING_CONNECT_TIMEOUT:2s}
+    read-timeout: ${OPEN_BANKING_READ_TIMEOUT:5s}
+    max-response-bytes: ${OPEN_BANKING_MAX_RESPONSE_BYTES:1048576}

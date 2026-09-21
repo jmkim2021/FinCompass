@@ -42,3 +42,7 @@ secrets/
 *.key
 *.p12
 *.pfx
+
+# Optional secret-bearing Spring profile; examples must contain no credentials.
+application-local.yml
+application-local.yaml

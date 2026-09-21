@@ -1,77 +1,46 @@
-# FinCompass Agent - 구현 상태와 승인 대기 계획
+# FinCompass Agent — 구현 상태
 
 업데이트: 2026-09-21 (Asia/Seoul).
 
 ## 현재 상태
 
-**Phase 0 초기 분석 완료. Phase 1 미착수, 사용자 승인 대기.**
+**Phase 1 구현 및 로컬 검증 완료. Phase 2 미착수, 승인 대기.**
 
-- Loanops baseline `e9227c3491804b5892bc71e151608a044a26263c` 감사.
-- PDF 28쪽 전체 텍스트/렌더링 확인 및 20개 요구사항 mapping 완료.
-- 원본은 수정하지 않고, 테스트를 격리 복사본에서 실행: backend 47/47 통과, 실패/오류/skip 0; frontend typecheck/build 통과.
-- Git 이력을 보존한 독립 baseline을 FinCompass 작업 폴더에 초기화. 기존 사용자 PDF 보존. 소스·migration·의존성·README/UI는 기존 내용 유지.
-- 문서: PDF_REQUIREMENTS.md, BASELINE.md, STATUS.md, AGENTS.md.
-- 새 금융 기능, 새 schema migration, 새 dependency, LLM/API 실연동, commit/push: 모두 수행하지 않음.
+- 사용자 승인 변경: 개발자 앱/credential/redirect/테스트 계좌 미준비로 실제 LIVE_TEST를 blocker로 두지 않음. adapter + WireMock + DEMO_REPLAY까지 이번 완료 범위. 실제 호출은 **LIVE_TEST_NOT_VERIFIED**.
+- Phase 0 baseline commit `c1d729d` 생성, SSH origin `git@github.com:jmkim2021/FinCompass.git`의 main에 최초 push 완료. 기존 `e9227c3` 이전 LoanOps history 보존.
+- 개발 branch: `phase/01-open-banking`. main에서 구현하지 않음. force push 없음. Phase 1 branch 원격 push는 아직 수행하지 않음.
+- 기존 Loanops 원본 read-only 유지. 기존 상품 pipeline/API/frontend/dependency/V1~V7 보존.
+- 신규 module: `personal/openbanking` provider/client/token/store/mapper/sync/manual runner 및 두 mode.
+- V8: 연결/state/run/raw/evidence/checkpoint 6개 additive table. Phase 2 canonical 모델 아님.
+- `AnnualInterestRate` 명시적 percent → decimal fraction 변환과 테스트 추가. 기존 상품 rate 의미는 변경하지 않음.
 
-## Phase 1: 승인 후 정확히 구현할 범위
+## 실제 검증
 
-PDF §12 p.22의 Phase 1은 **Open Banking Integration**이다. Financial Twin/시뮬레이션/매칭부터 시작하지 않는다.
+- Backend full test: **89개 통과**, 실패/오류/skip 0. 기존 47개 + 신규 42개.
+- WireMock 검증 완료: OAuth/refresh/만료/동시 refresh, balance, pagination(25건 경계/복수/마지막/반복/상한), timeout, partial failure, overlap/incremental/dedupe, 소유권·동의·mode, raw redaction.
+- DEMO_REPLAY 검증 완료: 공통 raw→mapping→provenance 경로, 같은 입력의 hash/identity 재현, Spring 기본 mode wiring. 빌드 JAR도 임시 PostgreSQL에서 잔액 1 page/1건, 거래 2 page/28건 SUCCESS, 카드·대출·리스 UNSUPPORTED 확인.
+- Frontend `npm run typecheck`, `npm run build` 통과. frontend unit/E2E runner 없음.
+- 실제 금융결제원 LIVE_TEST API 호출 **미실시**. WireMock success를 실연동 success로 표시하지 않는다.
+- 실행 명령/분류별 결과/증거: `PHASE1_VALIDATION.md`.
 
-### 목표
+## Phase 1 최종 설계와 구현 범위
 
-Open Banking 개발/테스트 환경에서 OAuth와 계좌 잔액·거래 조회가 동작하고, 원문/출처/상태가 보존되는 최소한의 Personal Finance Gateway를 완성한다. 외부 연결 없이 같은 계약을 검증할 DEMO_REPLAY 경로를 함께 둔다. 아직 complete Financial Twin을 만들거나 금융 지표를 계산하지 않는다.
+`OPEN_BANKING.md`에 architecture, 공식 계약 출처, 환경변수, 실행법, OAuth/sync lifecycle, pagination/dedupe, 보안, 미지원 capability, 기술부채를 기록했다. `RATE_UNITS.md`에 금리 단위를 기록했다.
 
-### 재사용
+Phase 0의 HTTP connection API는 제안이었다. 구현은 로컬 운영자용 manual profile + Java service interface로 제한했다. 실제 사용자 인증이 없는 기존 서버에 personal-data endpoint를 열지 않았으며 consumer UI는 추가하지 않았다. ownerRef는 운영자 가명으로, 다중 사용자 인증 체계가 아니다.
 
-- 기존 Spring Boot/RestClient/Jackson/DI와 JPA/Flyway/PostgreSQL.
-- PayloadHasher, 명시적 timeout, 정제된 오류, 별도 lifecycle 트랜잭션의 패턴.
-- 기존 WireMock/PostgreSQL Testcontainers와 47개 regression suite.
-- 기존 GET 운영 API 및 상품 pipeline은 유지. 새 개인 sync를 FSS/서울 source enum에 추가하지 않음.
+LIVE_TEST 환경에는 endpoint/credential/등록 redirect/기관 prefix/테스트 fintech_use_num, 안정적인 암호화 key와 별도 DB를 제공해야 한다. 공개 명세와 같은 계약이면 config 주입으로 검증할 수 있다. 등록/권한/상세 OAuth 계약의 실환경 확인은 잔여 작업이다.
 
-### 예정 파일과 서비스 (현재 존재하지 않는 설계 제안)
+정상 checkpoint는 실패로 교체하지 않는다. 중간 페이지 실패는 PAGINATION_INCOMPLETE + complete=false. 카드/대출/리스는 사용권한 미확인이므로 명시적 UNSUPPORTED. demo는 합성 fixture이며 LIVE_TEST 오류의 fallback으로 쓰지 않는다.
 
-1. `personal/gateway/PersonalFinanceProvider.java`: capability와 잔액/거래 조회 계약. card/loan은 supported/unsupported를 명시.
-2. `personal/provider/openbanking/`: Properties, Client, Provider, TokenService, TokenStore, OAuth state 관리, 전용 request/response DTO.
-3. `personal/provider/replay/`: 버전 고정된 sanitized fixture를 읽는 provider. `LIVE_TEST` 실패를 몰래 demo 성공으로 바꾸지 않음.
-4. `personal/sync/`: source_sync_run 시작/성공/실패, raw 기록, cursor 진행/완료 상태. 응답 성공코드와 HTTP 성공을 따로 판단.
-5. `personal/consent/` 및 최소 사용자/연결 식별 계약. provider 내부 fintech_use_num은 공용 DTO로 노출하지 않음.
-6. `api/`의 OpenBankingConnectionController/DTO: 연결과 sync 상태만 노출. 기존 error envelope를 유지.
-7. `application.yml`, `.env.example`: provider mode, endpoint/redirect/secret 참조, timeout, encryption key 참조. 비밀값 자체는 미포함. 보안 저장은 기존 스택/JDK를 우선 검토하고 새 dependency가 꼭 필요한 경우 이유/대안을 먼저 문서화.
-8. 새 backend integration test와 `src/test/resources/fixtures/openbanking/`. 기존 product fixture와 분리.
+## Phase 2에 넘길 제약
 
-### DB 변경 계획
-
-승인받은 Phase 1에서만 **V8 이후 신규 migration**을 추가한다. 기존 V1~V7은 수정하지 않는다. V8 번호는 그 시점 최신 migration을 확인하고 확정한다.
-
-최소 저장 범위는 financial_user, consent_grant, personal_source_connection/credential, source_sync_run, raw_openbanking_snapshot에 해당하는 개인 전용 모델이다. 암호화 token/key version/expiry, scope/동의기한, endpoint별 상태, sourceType/ingestionMode, request window/page cursor/completeness, raw hash/시각을 저장한다. `loanops` schema 내 별도 개인 테이블을 우선 검토하되 schema 분리 여부는 구현 시작 시 변경 계획에 명시한다. 완전한 account/transaction/card/loan canonical 적재는 Phase 2다.
-
-raw 보존은 OAuth token payload를 무차별 저장하는 뜻이 아니다. token은 별도 보호 저장하고 금융 응답 원문은 개인 전용 접근 제한/암호화 정책으로 보관한다. 일반 로그·UI에는 원문을 노출하지 않는다.
-
-### API 변경 계획
-
-PDF에 연결 API의 URL은 고정되지 않았으므로 다음은 Phase 1의 제안 계약이다.
-
-- `POST /api/v1/connections/open-banking/authorization`: state와 인증 시작 URL 생성.
-- `GET /api/v1/connections/open-banking/callback`: state 검증 및 code 교환. code/token은 로그/응답에서 제거.
-- `GET /api/v1/connections`: mode/capabilities/상태/마지막 sync/경고 조회.
-- `POST /api/v1/connections/{id}/sync`: 잔액·거래 조회 수행, 연결 소유권/동의 확인.
-- `GET /api/v1/source-sync-runs/{id}`: 정제된 실행·완전성 상태.
-
-기존 운영 API의 GET-only 정책과 DTO는 보존한다. 새 POST 경로만 필요한 origin/method 정책을 추가하고 테스트한다. connection/user 식별자를 임의 전달해 다른 사용자의 정보를 조회하지 못하도록 한다. PoC의 local test-user 경계와 실제 운영 인증은 구분해서 문서화한다.
-
-### Phase 1 구현 순서와 검증
-
-1. 작업 트리/원본 read-only와 baseline commit을 확인하고 파일/schema/API 변경 목록 작성.
-2. 공식 developer 환경의 client/redirect/scope, balance/transaction 계약을 확인. 비밀값은 환경변수 또는 ignored local config로만 제공.
-3. Provider/Mode/Capability와 보안 저장·동의 계약부터 구현.
-4. OAuth state → code exchange → access/refresh/expiry lifecycle 및 failure 테스트.
-5. balance endpoint → transaction endpoint 순서로 실제 계약에 매핑. cursor 마지막 페이지 확인까지 수집하고 실패하면 incomplete를 보존.
-6. 동일 response contract의 demo replay, sync 상태 및 metadata-only API 구현.
-7. WireMock에서 토큰 만료/refresh 실패/HTTP200 오류/timeout/페이지 25·26건/반복 cursor/중간 실패/미지원 capability/redaction/동의·소유권 오류를 검증.
-8. 전체 기존+신규 backend suite, frontend typecheck/build, git diff 확인 후 문서 갱신.
-9. 실제 developer endpoint로 OAuth와 balance/transaction 성공을 확인하고 민감정보 없는 실행 증거 기록. 계정/권한이 없어 수행 못하면 'contract/replay 검증 완료, LIVE_TEST 미완료'로 구분하며 Phase 1 전체 완료를 선언하지 않는다.
-
-**Phase 1 완료 기준**: 외부 개발 환경의 OAuth/잔액/거래 성공, token failure 처리, endpoint별 raw/provenance/완전성, 명시적 replay/capability 구분, 기존 47개 회귀 통과, 비밀값 미노출. 개인 canonical 전체·Twin·상환/주택/스트레스·Matching·Opportunity·Agent·consumer 전체 UI는 이 단계에 포함하지 않는다.
+- sync complete는 capability/요청 기간 범위만 보장한다. Financial Twin 완전성을 뜻하지 않는다.
+- 거래 복합 hash는 ingestion 관측값 dedupe이며 은행 원장 ID가 아니다. 동일 관측값의 실거래 구별/정정/새 연결/키 회전은 Phase 2에서 정책화.
+- 정상 음수 잔액 허용, observation timestamp와 sync timestamp 구별. freshness SLA는 향후 DQ에서 확정.
+- raw body는 암호화·민감값 제거. malformed body는 hash+omission marker만 보존되어 정확한 replay 불가.
+- 운영 인가/callback/계좌목록/철회·retention/키 회전/crash RUNNING 복구는 추가 운영 범위. 실제 개인정보 장기 운영 준비 완료라는 뜻이 아니다.
+- 상품 missing fields/catalogue reproducibility와 PDF 설명용 금융 예시는 Phase 0 원칙 유지.
 
 ## Phase 2 이후 구체적 구현 순서
 
@@ -126,12 +95,6 @@ PDF에 연결 API의 URL은 고정되지 않았으므로 다음은 Phase 1의 �
 - network-off DEMO_REPLAY와 LIVE_TEST 표시, 모든 source badges, missing/assumptions/limitations 표시.
 - 완료: 3개 persona와 7억 주택 demo, 브라우저 흐름/오류 상태 검증, frontend 테스트 공백 보완, 보안/trace/latency 검토, README와 demo 증거. 이미지나 그럴듯한 수치만으로 완료 선언 금지.
 
-## 우선 해결할 불명확성
+## 다음 승인 경계
 
-1. Phase 1: developer 계정/redirect/scope 및 실제 card/loan capability, token key 관리, 개인 raw 보존기간과 test user 경계.
-2. Phase 2~4: transaction dedupe key, 정상 음수잔액, cashflow 집계기간/필수지출, 카드청구 중복, freshness SLA, 3개 persona 상세.
-3. Phase 5: 기존 대출 상환조건, 세후/검증 소득 선택, 금리 단위, 부대비용/비상금, 고정금리 shock·연기 가정.
-4. Phase 6: 상품 결측 허용정책, 상환방식 매핑, 다중 publication 고정 방식, score 세부식/동점/freshness, 검토 후보가 없는 정상 경로.
-5. Phase 8~9: 숫자 출처 검사와 모델/보안/응답시간 기준, 실제 출처 상품의 offline replay 자료 확보.
-
-이 문서는 승인 요청을 위한 구체적인 구현 계획이다. **이번 작업 종료 후 사용자 승인 없이 Phase 1 코드를 작성하거나 migration/dependency를 추가하지 않는다.**
+Phase 2의 personal canonical/DQ, Financial Twin, 계산/Matching/Agent/consumer UI는 구현하지 않았다. **사용자 승인 후 Phase 2를 시작한다.**

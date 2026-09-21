@@ -5,7 +5,7 @@
 - 이 파일은 FinCompass Agent 저장소 전체에 적용한다. 사용자에게 한국어로 보고한다.
 - 먼저 `docs/implementation/STATUS.md`, `BASELINE.md`, `PDF_REQUIREMENTS.md`를 읽는다.
 - 제품/아키텍처 source of truth는 `docs/FinCompass_Agent_Project_Plan.pdf` 전체 28쪽이다. 본문뿐 아니라 표/도표도 확인한다.
-- 현재 승인 범위는 Phase 0 초기 분석까지이다. **사용자의 다음 단계 승인 전 Phase 1 기능·migration·dependency를 추가하지 않는다.**
+- 현재 승인 범위는 Phase 1 Open Banking Integration까지이다. **Phase 2는 사용자 승인 전 시작하지 않는다.**
 - 승인된 phase만 구현한다. PDF/문서에 적힌 후속 기능은 현재 실행 허가가 아니다. 명시적 사용자 지시와 승인 범위를 우선한다.
 - `../Loanops`는 영구 read-only baseline이다. 그 안에서 편집·빌드·테스트·format·reset·commit을 하지 않는다.
 - 구현/문서 변경은 이 FinCompass 저장소에서만 한다. 원본 `.env`, token, DB volume, build cache를 복사하지 않는다.
