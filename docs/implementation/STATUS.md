@@ -4,7 +4,7 @@
 
 ## 현재 상태
 
-Phase 8 FinCompass Agent 구현 및 품질 게이트 완료. 다음 구현은 Phase 9 Consumer UI/E2E다. 최종 Phase 10 acceptance 이전 main 병합 금지.
+Phase 9 Consumer UI/E2E 구현 및 품질 게이트 완료. 다음은 Phase 10 최종 hardening/demo/release다. 최종 acceptance 이전 main 병합 금지.
 
 - Phase 3 `7b0f588`을 SSH origin에 push하고 main을 안전하게 fast-forward/push했다.
 - 현재 작업 브랜치 `phase/04-10-fincompass-completion`.
@@ -19,6 +19,7 @@ Phase 8 FinCompass Agent 구현 및 품질 게이트 완료. 다음 구현은 Ph
 - Hard Filter 뒤에만 `PRODUCT_MATCH_SCORE_V1`(35/25/20/10/10)을 실행한다. Golden serving 2개 term은 한도·기간·정확한 상환방식·적격성 결측으로 모두 `INSUFFICIENT_DATA`, score/rank null이다.
 - V14 encrypted immutable opportunity event를 추가하고 `OPPORTUNITY_V1` 규칙으로 유동성 위험·부채부담 경고·금리 재검토·대환 검토를 근거와 함께 탐지한다. stale/partial/incomplete snapshot에서는 판정을 차단하며 동일 근거의 중복 이벤트를 만들지 않는다.
 - V15 encrypted immutable agent/tool audit를 추가했다. 공급자 중립 `AgentModelClient`, offline deterministic model, 기존 서비스만 호출하는 14개 typed tool, 필수 입력 질의, unsupported-number fallback과 재현 가능한 Golden 설명을 구현했다.
+- React/Vite 기존 스택에 FinCompass 9개 hash route, source badge, 명시적 Agent 입력, before/after·stress·candidate·opportunity·evidence 화면과 responsive/error/empty/warning 상태를 추가했다. 기존 LoanOps 운영 콘솔은 `#/admin`으로 보존했다.
 - 기존 Phase1 fixture 1/1/28과 V1~V10 보존. ../Loanops read-only.
 
 ## 실제 품질 게이트
@@ -32,6 +33,7 @@ Phase 8 FinCompass Agent 구현 및 품질 게이트 완료. 다음 구현은 Ph
 - Phase 6: **267/267 PASS, 실패0, 오류0, skip0** (2026-09-21 22:47 KST).
 - Phase 7: **274/274 PASS, 실패0, 오류0, skip0** (2026-09-21 23:01 KST).
 - Phase 8: **288/288 PASS, 실패0, 오류0, skip0** (2026-09-21 23:16 KST).
+- Phase 9: **289/289 PASS, 실패0, 오류0, skip0** (2026-09-21 23:32 KST). Consumer Golden API flow PASS, 브라우저 렌더링 PASS.
 - 실행: Java21, `./gradlew test bootJar --offline --no-daemon`.
 - frontend `npm run typecheck`, `npm run build`: PASS.
 - diff 검토: 기존 migration 불변; V9→V10 전용 테스트 target10으로 유지; 최신 schema assertion11; 신규 source/store/calculation/API와 보안 경계 검토.
@@ -43,7 +45,6 @@ Phase 8 FinCompass Agent 구현 및 품질 게이트 완료. 다음 구현은 Ph
 
 ## 이후 구현 순서
 
-9. 기존 Admin 보존 + Consumer 화면, evidence와 source badges, UI 검증.
 10. clean DB Golden E2E, 보안/수치/원본 무결성 감사, README/docs 정리, 최종 조건 통과 후 push/main fast-forward.
 
 ## 경계 및 제약
