@@ -4,7 +4,7 @@
 
 ## 현재 상태
 
-Phase 4 Financial Twin 완료. 다음 구현은 Phase 5 Financial Simulation이다. 최종 Phase 10 acceptance 이전 main 병합 금지.
+Phase 5 Financial Simulation 완료. 다음 구현은 Phase 6 Product Matching이다. 최종 Phase 10 acceptance 이전 main 병합 금지.
 
 - Phase 3 `7b0f588`을 SSH origin에 push하고 main을 안전하게 fast-forward/push했다.
 - 현재 작업 브랜치 `phase/04-10-fincompass-completion`.
@@ -12,6 +12,9 @@ Phase 4 Financial Twin 완료. 다음 구현은 Phase 5 Financial Simulation이�
 - 11개 BigDecimal 지표, 결측/0분모/거래 분류/부채 이중차감 방지, 정확한 source-state fingerprint.
 - 별도 Golden fixture: Open Banking 1계좌/1잔액/32거래(25+7 pagination), PMD 66m 소득/EMPLOYED, 명시적 USER_INPUT 대출30m와 상환/지출 가정.
 - Snapshot/현금흐름/부채 API, loopback 강제 DEMO-only, latest 평가 실패를 별도 currentAssessment로 표시.
+- V12 encrypted immutable scenario/assumption/result, loan/home/stress/comparison API를 추가했다.
+- `FINANCIAL_SIMULATION_V1`: DECIMAL128 중간 계산, 월별 HALF_EVEN 2자리, 마지막 회차 잔액 정산, 11개 deterministic stress grid와 명시적 A~D 대안을 구현했다.
+- Golden A(7억원, 현금1.1억원, 주담대5.9억원, 4.5%, 360개월)는 월상환 2,989,443.33원, 총이자 486,199,597.17원, 구매후 월여유 -1,789,443.33원이다. 승인/적격 판정이 아니다.
 - 기존 Phase1 fixture 1/1/28과 V1~V10 보존. ../Loanops read-only.
 
 ## 실제 품질 게이트
@@ -21,6 +24,7 @@ Phase 4 Financial Twin 완료. 다음 구현은 Phase 5 Financial Simulation이�
 - Phase 2: 131/131 PASS.
 - Phase 3: 177/177 PASS.
 - Phase 4: **217/217 PASS, 실패0, 오류0, skip0** (2026-09-21 19:51 KST).
+- Phase 5: **254/254 PASS, 실패0, 오류0, skip0** (2026-09-21 22:23 KST).
 - 실행: Java21, `./gradlew test bootJar --offline --no-daemon`.
 - frontend `npm run typecheck`, `npm run build`: PASS.
 - diff 검토: 기존 migration 불변; V9→V10 전용 테스트 target10으로 유지; 최신 schema assertion11; 신규 source/store/calculation/API와 보안 경계 검토.
@@ -32,7 +36,6 @@ Phase 4 Financial Twin 완료. 다음 구현은 Phase 5 Financial Simulation이�
 
 ## 이후 구현 순서
 
-5. Loan/Home/Stress/Alternative simulation + V12 저장, 동일 schema 비교.
 6. LoanOps serving 기반 동결 candidate pool, hard filter, simulation, versioned 35/25/20/10/10 score.
 7. 설정 기반 Opportunity 이벤트와 근거/중복 방지.
 8. typed tools, deterministic/mock Agent, numeric grounding, 암호화 audit trace.

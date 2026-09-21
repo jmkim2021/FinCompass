@@ -10,15 +10,23 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class ApiWebConfiguration implements WebMvcConfigurer {
 
     private final String[] allowedOrigins;
+    private final boolean demoEnabled;
 
     public ApiWebConfiguration(
-            @Value("${loanops.api.allowed-origins:http://localhost:5173}") String allowedOrigins
+            @Value("${loanops.api.allowed-origins:http://localhost:5173}") String allowedOrigins,
+            @Value("${fincompass.demo.enabled:false}") boolean demoEnabled
     ) {
         this.allowedOrigins = StringUtils.commaDelimitedListToStringArray(allowedOrigins);
+        this.demoEnabled = demoEnabled;
     }
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
+        if (demoEnabled) {
+            for (String path : new String[]{"/api/v1/scenarios", "/api/v1/scenarios/**", "/api/v1/scenario-comparisons"}) {
+                registry.addMapping(path).allowedOrigins(allowedOrigins).allowedMethods("GET", "POST").allowedHeaders("Content-Type").maxAge(3600);
+            }
+        }
         registry.addMapping("/api/**")
                 .allowedOrigins(allowedOrigins)
                 .allowedMethods("GET")

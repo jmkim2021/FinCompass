@@ -112,7 +112,7 @@ class PersonalFinanceIntegrationTest {
     }
     @Test void springConfigurationWiresCanonicalServiceAndProvider() { assertThat(wiredService).isNotNull();assertThat(wiredProvider.code()).isEqualTo(ProviderCode.OPEN_BANKING); }
     @Test void cleanDatabaseMigratesThroughV9AndRequiredEmptyDomainsExist() {
-        assertThat(jdbc.queryForObject("SELECT max(version::int) FROM loanops.flyway_schema_history",Integer.class)).isEqualTo(11);
+        assertThat(jdbc.queryForObject("SELECT max(version::int) FROM loanops.flyway_schema_history",Integer.class)).isEqualTo(12);
         for(String table:List.of("loan_accounts","loan_payments","card_accounts","card_bills","investment_positions","income_evidence")) assertThat(count(table)).isZero();
     }
     @Test void replayGoldenCanonicalizesOneAccountOneBalanceAndTwentyEightTransactions() {
