@@ -4,52 +4,32 @@
 
 ## 현재 상태
 
-**Phase 1 구현 및 로컬 검증 완료. Phase 2 미착수, 승인 대기.**
+**Phase 2 Canonical Personal Finance + Data Quality 구현 완료. Backend 131/131, frontend typecheck/build, 실제 JAR replay 검증 완료. Phase 3는 미착수이며 별도 승인 대기.**
 
-- 사용자 승인 변경: 개발자 앱/credential/redirect/테스트 계좌 미준비로 실제 LIVE_TEST를 blocker로 두지 않음. adapter + WireMock + DEMO_REPLAY까지 이번 완료 범위. 실제 호출은 **LIVE_TEST_NOT_VERIFIED**.
-- Phase 0 baseline commit `c1d729d` 생성, SSH origin `git@github.com:jmkim2021/FinCompass.git`의 main에 최초 push 완료. 기존 `e9227c3` 이전 LoanOps history 보존.
-- 개발 branch: `phase/01-open-banking`. main에서 구현하지 않음. force push 없음. Phase 1 branch 원격 push는 아직 수행하지 않음.
-- 기존 Loanops 원본 read-only 유지. 기존 상품 pipeline/API/frontend/dependency/V1~V7 보존.
-- 신규 module: `personal/openbanking` provider/client/token/store/mapper/sync/manual runner 및 두 mode.
-- V8: 연결/state/run/raw/evidence/checkpoint 6개 additive table. Phase 2 canonical 모델 아님.
-- `AnnualInterestRate` 명시적 percent → decimal fraction 변환과 테스트 추가. 기존 상품 rate 의미는 변경하지 않음.
+- 사용자 승인에 따라 Phase 1 `0a2fdb2`를 origin/phase/01-open-banking에 push하고, main을 fast-forward한 후 origin/main에 push했다. Phase 0 `c1d729d` 및 이전 history는 보존했다. force push 없음.
+- 현재 개발 branch는 `phase/02-personal-finance`. Phase 2 원격 push는 하지 않는다.
+- ../Loanops는 read-only. 기존 상품 pipeline/API/frontend/dependency 및 V1–V8은 보존한다.
+- 실제 KFTC 호출은 계속 **LIVE_TEST_NOT_VERIFIED**. 사용자 지시에 따라 credential 미준비는 이번 단계 blocker가 아니다.
 
-## 실제 검증
+## Phase 2 결과
 
-- Backend full test: **89개 통과**, 실패/오류/skip 0. 기존 47개 + 신규 42개.
-- WireMock 검증 완료: OAuth/refresh/만료/동시 refresh, balance, pagination(25건 경계/복수/마지막/반복/상한), timeout, partial failure, overlap/incremental/dedupe, 소유권·동의·mode, raw redaction.
-- DEMO_REPLAY 검증 완료: 공통 raw→mapping→provenance 경로, 같은 입력의 hash/identity 재현, Spring 기본 mode wiring. 빌드 JAR도 임시 PostgreSQL에서 잔액 1 page/1건, 거래 2 page/28건 SUCCESS, 카드·대출·리스 UNSUPPORTED 확인.
-- Frontend `npm run typecheck`, `npm run build` 통과. frontend unit/E2E runner 없음.
-- 실제 금융결제원 LIVE_TEST API 호출 **미실시**. WireMock success를 실연동 success로 표시하지 않는다.
-- 실행 명령/분류별 결과/증거: `PHASE1_VALIDATION.md`.
+- PersonalFinanceProvider와 Open Banking evidence adapter, canonical 11개 domain concept, 명시적 DEMO/DEVELOPER_TEST consent, 중앙 provenance 구현.
+- V9에서 16개 canonical/DQ/lineage/current table 추가. 실제 생성 대상은 계좌/잔액/거래이며 loan/card/investment/income rows는 만들지 않는다.
+- 6개 필수 DQ rule 및 안전한 current promotion 구현. incomplete/invalid/stale는 기존 정상 current를 대체하지 않는다. 최신 실패와 이전 정상 상태를 함께 노출한다.
+- stale 기본 24h, policy/threshold 저장, 조회 시 freshness 재평가. 거래 관측 identity는 Phase 1 HMAC 규칙 그대로 사용.
+- 서비스 API와 local manual replay profile만 추가. consumer HTTP API/UI, Financial Twin, Public MyData Mock, 계산/매칭/Agent는 구현하지 않았다.
+- 구현 계약·mapping·정밀도·NULL·consent·암호화·known limits·Phase 3 handoff: `PERSONAL_FINANCE_MODEL.md`.
+- 실제 backend/frontend/migration/replay/security/integrity 결과: `PHASE2_VALIDATION.md`.
 
-## Phase 1 최종 설계와 구현 범위
+## 이전 검증과 남은 경계
 
-`OPEN_BANKING.md`에 architecture, 공식 계약 출처, 환경변수, 실행법, OAuth/sync lifecycle, pagination/dedupe, 보안, 미지원 capability, 기술부채를 기록했다. `RATE_UNITS.md`에 금리 단위를 기록했다.
+Phase 1은 backend 89/89(기존 47 + 신규 42), frontend typecheck/build, WireMock OAuth/refresh/balance/transaction/pagination/timeout/partial, 실제 replay JAR를 검증했다. 상세는 `PHASE1_VALIDATION.md`, 계약/설정은 `OPEN_BANKING.md`, 금리 단위는 `RATE_UNITS.md`에 보존한다.
 
-Phase 0의 HTTP connection API는 제안이었다. 구현은 로컬 운영자용 manual profile + Java service interface로 제한했다. 실제 사용자 인증이 없는 기존 서버에 personal-data endpoint를 열지 않았으며 consumer UI는 추가하지 않았다. ownerRef는 운영자 가명으로, 다중 사용자 인증 체계가 아니다.
+거래 composite identity는 은행 원장 ID가 아니다. 동일 관측값의 실거래 구별/정정/재연결/키 회전은 자동 해결하지 않는다. 계좌 metadata는 최초 관측에 고정된다. provider Java boundary와 별개로 현재 relational connection/evidence FK는 Open Banking에 묶여 있어 Phase 3에서 additive 확장이 필요하다.
 
-LIVE_TEST 환경에는 endpoint/credential/등록 redirect/기관 prefix/테스트 fintech_use_num, 안정적인 암호화 key와 별도 DB를 제공해야 한다. 공개 명세와 같은 계약이면 config 주입으로 검증할 수 있다. 등록/권한/상세 OAuth 계약의 실환경 확인은 잔여 작업이다.
+운영자 가명은 consumer 인증을 대체하지 않는다. canonical 동의 철회와 upstream OAuth 폐기는 별개이다. retention/파기/key rotation/crash recovery는 운영 부채로 남는다. 이 단계 완료는 개인정보 장기 운영 준비 완료를 뜻하지 않는다.
 
-정상 checkpoint는 실패로 교체하지 않는다. 중간 페이지 실패는 PAGINATION_INCOMPLETE + complete=false. 카드/대출/리스는 사용권한 미확인이므로 명시적 UNSUPPORTED. demo는 합성 fixture이며 LIVE_TEST 오류의 fallback으로 쓰지 않는다.
-
-## Phase 2에 넘길 제약
-
-- sync complete는 capability/요청 기간 범위만 보장한다. Financial Twin 완전성을 뜻하지 않는다.
-- 거래 복합 hash는 ingestion 관측값 dedupe이며 은행 원장 ID가 아니다. 동일 관측값의 실거래 구별/정정/새 연결/키 회전은 Phase 2에서 정책화.
-- 정상 음수 잔액 허용, observation timestamp와 sync timestamp 구별. freshness SLA는 향후 DQ에서 확정.
-- raw body는 암호화·민감값 제거. malformed body는 hash+omission marker만 보존되어 정확한 replay 불가.
-- 운영 인가/callback/계좌목록/철회·retention/키 회전/crash RUNNING 복구는 추가 운영 범위. 실제 개인정보 장기 운영 준비 완료라는 뜻이 아니다.
-- 상품 missing fields/catalogue reproducibility와 PDF 설명용 금융 예시는 Phase 0 원칙 유지.
-
-## Phase 2 이후 구체적 구현 순서
-
-### Phase 2 - Personal Canonical Model 및 DQ
-
-- Phase 1 raw를 account/balance/transaction/card/loan/payment/investment 모델로 정규화. 카드/대출 미지원은 DEMO fixture 또는 비활성화를 명시.
-- 거래 window overlap/dedupe·정정 정책, source sync cursor, 기관 실패 격리, freshness, 개인 DQ issue/lineage 구현.
-- DB: 개인 canonical/quality/lineage 및 snapshot completeness 메타데이터 추가. 아직 계산된 Twin 승격은 Phase 4지만 complete dataset gate를 여기서 제공.
-- 완료: 동일 raw mapping 재현, 중복/누락/정정/잔액/대출 mismatch, incomplete pagination 차단 및 마지막 정상 dataset 보호 테스트.
+## 이후 구현 순서 — 승인 대기
 
 ### Phase 3 - Public MyData Mock / 소득 evidence / offline fixture
 
@@ -97,4 +77,4 @@ LIVE_TEST 환경에는 endpoint/credential/등록 redirect/기관 prefix/테스�
 
 ## 다음 승인 경계
 
-Phase 2의 personal canonical/DQ, Financial Twin, 계산/Matching/Agent/consumer UI는 구현하지 않았다. **사용자 승인 후 Phase 2를 시작한다.**
+**Phase 3 Public MyData Mock / 소득 evidence / offline fixture는 시작하지 않았다. 사용자 승인 후에만 착수한다.**

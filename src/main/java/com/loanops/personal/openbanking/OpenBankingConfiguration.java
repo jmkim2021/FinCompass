@@ -26,4 +26,9 @@ public class OpenBankingConfiguration {
     @Bean OpenBankingSyncService openBankingSyncService(OpenBankingProvider provider,OpenBankingStore store,OpenBankingMapper mapper,OpenBankingProperties config) {
         return new OpenBankingSyncService(provider,store,mapper,config,Clock.systemUTC());
     }
+    @Bean OpenBankingPersonalFinanceProvider openBankingPersonalFinanceProvider(OpenBankingStore store,OpenBankingMapper mapper,
+            OpenBankingJson json,SecretBox box,JdbcTemplate jdbc) {
+        return new OpenBankingPersonalFinanceProvider(store,mapper,json,box,jdbc);
+    }
+
 }

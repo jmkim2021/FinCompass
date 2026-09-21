@@ -75,3 +75,9 @@ fincompass:
     connect-timeout: ${OPEN_BANKING_CONNECT_TIMEOUT:2s}
     read-timeout: ${OPEN_BANKING_READ_TIMEOUT:5s}
     max-response-bytes: ${OPEN_BANKING_MAX_RESPONSE_BYTES:1048576}
+
+  personal:
+    enabled: ${PERSONAL_FINANCE_ENABLED:false}
+  data-quality:
+    balance-stale-after: ${PERSONAL_BALANCE_STALE_AFTER:24h}
+    policy-version: ${PERSONAL_DQ_POLICY_VERSION:personal-dq-v1}
