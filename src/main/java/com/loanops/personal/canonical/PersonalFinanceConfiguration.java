@@ -20,7 +20,7 @@ public class PersonalFinanceConfiguration {
     }
     @Bean com.loanops.personal.publicmydata.MockPublicMyDataProvider mockPublicMyDataProvider(JdbcTemplate jdbc,PersonalFinanceCipher cipher,ObjectMapper json) { return new com.loanops.personal.publicmydata.MockPublicMyDataProvider(jdbc,cipher,json); }
     @Bean PersonalFinanceStore personalFinanceStore(JdbcTemplate jdbc,PlatformTransactionManager manager,PersonalFinanceCipher cipher) { return new PersonalFinanceStore(jdbc,manager,cipher); }
-    @Bean PersonalFinanceService personalFinanceService(List<PersonalFinanceProvider> providers,PersonalFinanceStore store,PersonalFinanceCipher cipher,PersonalQualityProperties config,com.loanops.personal.quality.IncomeQualityProperties incomeConfig) {
-        return new PersonalFinanceService(providers,store,cipher,config,Clock.systemUTC(),incomeConfig);
+    @Bean PersonalFinanceService personalFinanceService(List<PersonalFinanceProvider> providers,PersonalFinanceStore store,PersonalFinanceCipher cipher,PersonalQualityProperties config,com.loanops.personal.quality.IncomeQualityProperties incomeConfig,org.springframework.beans.factory.ObjectProvider<Clock> clocks) {
+        return new PersonalFinanceService(providers,store,cipher,config,clocks.getIfAvailable(Clock::systemUTC),incomeConfig);
     }
 }

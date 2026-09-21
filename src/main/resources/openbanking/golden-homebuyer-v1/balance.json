@@ -1,0 +1,8 @@
+{
+  "rsp_code": "A0000",
+  "bank_rsp_code": "000",
+  "api_tran_dtm": "20260921090000000",
+  "balance_amt": "120000000",
+  "available_amt": "120000000",
+  "fixture_origin": "SYNTHETIC_GOLDEN_HOME_BUYER_V1"
+}

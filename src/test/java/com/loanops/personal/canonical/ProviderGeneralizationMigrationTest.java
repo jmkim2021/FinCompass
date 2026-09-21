@@ -29,7 +29,7 @@ class ProviderGeneralizationMigrationTest {
   });
   var rawBefore=jdbc.queryForList("SELECT * FROM loanops.raw_openbanking_snapshots");var accountBefore=jdbc.queryForList("SELECT * FROM loanops.financial_accounts");
   var checksums=jdbc.queryForList("SELECT version,checksum FROM loanops.flyway_schema_history WHERE version IS NOT NULL ORDER BY installed_rank");
-  var flyway=Flyway.configure().dataSource(ds).schemas("loanops").defaultSchema("loanops").load();assertThat(flyway.migrate().migrationsExecuted).isEqualTo(1);flyway.validate();
+  var flyway=Flyway.configure().dataSource(ds).schemas("loanops").defaultSchema("loanops").target("10").load();assertThat(flyway.migrate().migrationsExecuted).isEqualTo(1);flyway.validate();
   assertThat(jdbc.queryForList("SELECT * FROM loanops.raw_openbanking_snapshots")).isEqualTo(rawBefore);assertThat(jdbc.queryForList("SELECT * FROM loanops.financial_accounts")).isEqualTo(accountBefore);
   assertThat(jdbc.queryForList("SELECT version,checksum FROM loanops.flyway_schema_history WHERE version::int<=9 ORDER BY installed_rank")).isEqualTo(checksums);
   assertThat(jdbc.queryForObject("SELECT provider_connection_id FROM loanops.consent_grants WHERE id=?",UUID.class,consent)).isEqualTo(conn);

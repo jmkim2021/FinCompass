@@ -1,0 +1,11 @@
+# Explicit offline fixture time; never enabled for customer/live data.
+server:
+  address: 127.0.0.1
+fincompass:
+  demo:
+    enabled: true
+  open-banking:
+    enabled: true
+    mode: DEMO_REPLAY
+  personal:
+    enabled: true

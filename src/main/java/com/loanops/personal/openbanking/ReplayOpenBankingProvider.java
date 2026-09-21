@@ -11,7 +11,12 @@ import static com.loanops.personal.openbanking.OpenBankingException.Category.*;
 public final class ReplayOpenBankingProvider implements OpenBankingProvider {
     private final OpenBankingJson json;
     private final Clock clock;
-    ReplayOpenBankingProvider(OpenBankingJson json, Clock clock) { this.json=json; this.clock=clock; }
+    private final String fixtureFolder;
+    ReplayOpenBankingProvider(OpenBankingJson json, Clock clock) { this(json,clock,"demo-v1"); }
+    ReplayOpenBankingProvider(OpenBankingJson json, Clock clock, String fixtureFolder) {
+        if(!Set.of("demo-v1","golden-homebuyer-v1").contains(fixtureFolder)) throw new OpenBankingException(CONFIGURATION);
+        this.json=json; this.clock=clock; this.fixtureFolder=fixtureFolder;
+    }
     public OpenBankingMode mode() { return OpenBankingMode.DEMO_REPLAY; }
     public List<CapabilityState> capabilities() { return OpenBankingProvider.contractCapabilities(); }
     public ProviderResponse balance(Connection c) { return response(OpenBankingClient.BALANCE_PATH,fixture("balance.json")); }
@@ -34,7 +39,7 @@ public final class ReplayOpenBankingProvider implements OpenBankingProvider {
     }
     private ProviderResponse response(String endpoint,String body) { return new ProviderResponse(new RawResponse(endpoint,clock.instant(),clock.instant(),200,body),List.of()); }
     private String fixture(String name) {
-        try(var input=getClass().getResourceAsStream("/openbanking/demo-v1/"+name)) {
+        try(var input=getClass().getResourceAsStream("/openbanking/"+fixtureFolder+"/"+name)) {
             if(input==null) throw new IllegalStateException();
             return new String(input.readAllBytes(),java.nio.charset.StandardCharsets.UTF_8);
         } catch(Exception ex) { throw new OpenBankingException(CONFIGURATION); }

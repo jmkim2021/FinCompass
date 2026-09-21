@@ -1,0 +1,327 @@
+{
+  "rsp_code": "A0000",
+  "bank_rsp_code": "000",
+  "fixture_origin": "SYNTHETIC_GOLDEN_HOME_BUYER_V1",
+  "res_list": [
+    {
+      "tran_date": "20260801",
+      "tran_time": "100000",
+      "inout_type": "출금",
+      "tran_type": "체크카드",
+      "tran_amt": "100000",
+      "print_content": "GOLDEN_V1_LIVING_EXPENSE",
+      "branch_name": "SYNTHETIC_DEMO",
+      "after_balance_amt": "118500000"
+    },
+    {
+      "tran_date": "20260802",
+      "tran_time": "100000",
+      "inout_type": "출금",
+      "tran_type": "체크카드",
+      "tran_amt": "100000",
+      "print_content": "GOLDEN_V1_LIVING_EXPENSE",
+      "branch_name": "SYNTHETIC_DEMO",
+      "after_balance_amt": "118400000"
+    },
+    {
+      "tran_date": "20260803",
+      "tran_time": "100000",
+      "inout_type": "출금",
+      "tran_type": "체크카드",
+      "tran_amt": "100000",
+      "print_content": "GOLDEN_V1_LIVING_EXPENSE",
+      "branch_name": "SYNTHETIC_DEMO",
+      "after_balance_amt": "118300000"
+    },
+    {
+      "tran_date": "20260804",
+      "tran_time": "100000",
+      "inout_type": "출금",
+      "tran_type": "체크카드",
+      "tran_amt": "100000",
+      "print_content": "GOLDEN_V1_LIVING_EXPENSE",
+      "branch_name": "SYNTHETIC_DEMO",
+      "after_balance_amt": "118200000"
+    },
+    {
+      "tran_date": "20260805",
+      "tran_time": "100000",
+      "inout_type": "출금",
+      "tran_type": "체크카드",
+      "tran_amt": "100000",
+      "print_content": "GOLDEN_V1_LIVING_EXPENSE",
+      "branch_name": "SYNTHETIC_DEMO",
+      "after_balance_amt": "118100000"
+    },
+    {
+      "tran_date": "20260806",
+      "tran_time": "100000",
+      "inout_type": "출금",
+      "tran_type": "체크카드",
+      "tran_amt": "100000",
+      "print_content": "GOLDEN_V1_LIVING_EXPENSE",
+      "branch_name": "SYNTHETIC_DEMO",
+      "after_balance_amt": "118000000"
+    },
+    {
+      "tran_date": "20260807",
+      "tran_time": "100000",
+      "inout_type": "출금",
+      "tran_type": "체크카드",
+      "tran_amt": "100000",
+      "print_content": "GOLDEN_V1_LIVING_EXPENSE",
+      "branch_name": "SYNTHETIC_DEMO",
+      "after_balance_amt": "117900000"
+    },
+    {
+      "tran_date": "20260808",
+      "tran_time": "100000",
+      "inout_type": "출금",
+      "tran_type": "체크카드",
+      "tran_amt": "100000",
+      "print_content": "GOLDEN_V1_LIVING_EXPENSE",
+      "branch_name": "SYNTHETIC_DEMO",
+      "after_balance_amt": "117800000"
+    },
+    {
+      "tran_date": "20260809",
+      "tran_time": "100000",
+      "inout_type": "출금",
+      "tran_type": "체크카드",
+      "tran_amt": "100000",
+      "print_content": "GOLDEN_V1_LIVING_EXPENSE",
+      "branch_name": "SYNTHETIC_DEMO",
+      "after_balance_amt": "117700000"
+    },
+    {
+      "tran_date": "20260810",
+      "tran_time": "100000",
+      "inout_type": "출금",
+      "tran_type": "체크카드",
+      "tran_amt": "100000",
+      "print_content": "GOLDEN_V1_LIVING_EXPENSE",
+      "branch_name": "SYNTHETIC_DEMO",
+      "after_balance_amt": "117600000"
+    },
+    {
+      "tran_date": "20260811",
+      "tran_time": "100000",
+      "inout_type": "출금",
+      "tran_type": "체크카드",
+      "tran_amt": "100000",
+      "print_content": "GOLDEN_V1_LIVING_EXPENSE",
+      "branch_name": "SYNTHETIC_DEMO",
+      "after_balance_amt": "117500000"
+    },
+    {
+      "tran_date": "20260812",
+      "tran_time": "100000",
+      "inout_type": "출금",
+      "tran_type": "체크카드",
+      "tran_amt": "100000",
+      "print_content": "GOLDEN_V1_LIVING_EXPENSE",
+      "branch_name": "SYNTHETIC_DEMO",
+      "after_balance_amt": "117400000"
+    },
+    {
+      "tran_date": "20260813",
+      "tran_time": "100000",
+      "inout_type": "출금",
+      "tran_type": "체크카드",
+      "tran_amt": "100000",
+      "print_content": "GOLDEN_V1_LIVING_EXPENSE",
+      "branch_name": "SYNTHETIC_DEMO",
+      "after_balance_amt": "117300000"
+    },
+    {
+      "tran_date": "20260814",
+      "tran_time": "100000",
+      "inout_type": "출금",
+      "tran_type": "체크카드",
+      "tran_amt": "100000",
+      "print_content": "GOLDEN_V1_LIVING_EXPENSE",
+      "branch_name": "SYNTHETIC_DEMO",
+      "after_balance_amt": "117200000"
+    },
+    {
+      "tran_date": "20260815",
+      "tran_time": "100000",
+      "inout_type": "출금",
+      "tran_type": "체크카드",
+      "tran_amt": "100000",
+      "print_content": "GOLDEN_V1_LIVING_EXPENSE",
+      "branch_name": "SYNTHETIC_DEMO",
+      "after_balance_amt": "117100000"
+    },
+    {
+      "tran_date": "20260816",
+      "tran_time": "100000",
+      "inout_type": "출금",
+      "tran_type": "체크카드",
+      "tran_amt": "100000",
+      "print_content": "GOLDEN_V1_LIVING_EXPENSE",
+      "branch_name": "SYNTHETIC_DEMO",
+      "after_balance_amt": "117000000"
+    },
+    {
+      "tran_date": "20260817",
+      "tran_time": "100000",
+      "inout_type": "출금",
+      "tran_type": "체크카드",
+      "tran_amt": "100000",
+      "print_content": "GOLDEN_V1_LIVING_EXPENSE",
+      "branch_name": "SYNTHETIC_DEMO",
+      "after_balance_amt": "116900000"
+    },
+    {
+      "tran_date": "20260818",
+      "tran_time": "100000",
+      "inout_type": "출금",
+      "tran_type": "체크카드",
+      "tran_amt": "100000",
+      "print_content": "GOLDEN_V1_LIVING_EXPENSE",
+      "branch_name": "SYNTHETIC_DEMO",
+      "after_balance_amt": "116800000"
+    },
+    {
+      "tran_date": "20260819",
+      "tran_time": "100000",
+      "inout_type": "출금",
+      "tran_type": "체크카드",
+      "tran_amt": "100000",
+      "print_content": "GOLDEN_V1_LIVING_EXPENSE",
+      "branch_name": "SYNTHETIC_DEMO",
+      "after_balance_amt": "116700000"
+    },
+    {
+      "tran_date": "20260820",
+      "tran_time": "100000",
+      "inout_type": "출금",
+      "tran_type": "체크카드",
+      "tran_amt": "100000",
+      "print_content": "GOLDEN_V1_LIVING_EXPENSE",
+      "branch_name": "SYNTHETIC_DEMO",
+      "after_balance_amt": "116600000"
+    },
+    {
+      "tran_date": "20260821",
+      "tran_time": "100000",
+      "inout_type": "출금",
+      "tran_type": "체크카드",
+      "tran_amt": "100000",
+      "print_content": "GOLDEN_V1_LIVING_EXPENSE",
+      "branch_name": "SYNTHETIC_DEMO",
+      "after_balance_amt": "116500000"
+    },
+    {
+      "tran_date": "20260822",
+      "tran_time": "100000",
+      "inout_type": "출금",
+      "tran_type": "체크카드",
+      "tran_amt": "100000",
+      "print_content": "GOLDEN_V1_LIVING_EXPENSE",
+      "branch_name": "SYNTHETIC_DEMO",
+      "after_balance_amt": "116400000"
+    },
+    {
+      "tran_date": "20260823",
+      "tran_time": "100000",
+      "inout_type": "출금",
+      "tran_type": "체크카드",
+      "tran_amt": "100000",
+      "print_content": "GOLDEN_V1_LIVING_EXPENSE",
+      "branch_name": "SYNTHETIC_DEMO",
+      "after_balance_amt": "116300000"
+    },
+    {
+      "tran_date": "20260824",
+      "tran_time": "100000",
+      "inout_type": "출금",
+      "tran_type": "체크카드",
+      "tran_amt": "100000",
+      "print_content": "GOLDEN_V1_LIVING_EXPENSE",
+      "branch_name": "SYNTHETIC_DEMO",
+      "after_balance_amt": "116200000"
+    },
+    {
+      "tran_date": "20260825",
+      "tran_time": "090000",
+      "inout_type": "입금",
+      "tran_type": "이체",
+      "tran_amt": "4800000",
+      "print_content": "GOLDEN_V1_INCOME",
+      "branch_name": "SYNTHETIC_DEMO",
+      "after_balance_amt": "121000000"
+    },
+    {
+      "tran_date": "20260825",
+      "tran_time": "100000",
+      "inout_type": "출금",
+      "tran_type": "체크카드",
+      "tran_amt": "100000",
+      "print_content": "GOLDEN_V1_LIVING_EXPENSE",
+      "branch_name": "SYNTHETIC_DEMO",
+      "after_balance_amt": "120900000"
+    },
+    {
+      "tran_date": "20260826",
+      "tran_time": "100000",
+      "inout_type": "출금",
+      "tran_type": "체크카드",
+      "tran_amt": "100000",
+      "print_content": "GOLDEN_V1_LIVING_EXPENSE",
+      "branch_name": "SYNTHETIC_DEMO",
+      "after_balance_amt": "120800000"
+    },
+    {
+      "tran_date": "20260826",
+      "tran_time": "120000",
+      "inout_type": "출금",
+      "tran_type": "이체",
+      "tran_amt": "600000",
+      "print_content": "GOLDEN_V1_DEBT_SERVICE",
+      "branch_name": "SYNTHETIC_DEMO",
+      "after_balance_amt": "120200000"
+    },
+    {
+      "tran_date": "20260827",
+      "tran_time": "100000",
+      "inout_type": "출금",
+      "tran_type": "체크카드",
+      "tran_amt": "100000",
+      "print_content": "GOLDEN_V1_LIVING_EXPENSE",
+      "branch_name": "SYNTHETIC_DEMO",
+      "after_balance_amt": "120100000"
+    },
+    {
+      "tran_date": "20260827",
+      "tran_time": "140000",
+      "inout_type": "출금",
+      "tran_type": "이체",
+      "tran_amt": "100000",
+      "print_content": "GOLDEN_V1_TRANSFER",
+      "branch_name": "SYNTHETIC_DEMO",
+      "after_balance_amt": "120000000"
+    },
+    {
+      "tran_date": "20260828",
+      "tran_time": "100000",
+      "inout_type": "출금",
+      "tran_type": "체크카드",
+      "tran_amt": "100000",
+      "print_content": "GOLDEN_V1_LIVING_EXPENSE",
+      "branch_name": "SYNTHETIC_DEMO",
+      "after_balance_amt": "119900000"
+    },
+    {
+      "tran_date": "20260828",
+      "tran_time": "140000",
+      "inout_type": "입금",
+      "tran_type": "이체",
+      "tran_amt": "100000",
+      "print_content": "GOLDEN_V1_TRANSFER",
+      "branch_name": "SYNTHETIC_DEMO",
+      "after_balance_amt": "120000000"
+    }
+  ]
+}
