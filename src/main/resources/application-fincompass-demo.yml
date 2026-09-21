@@ -9,3 +9,5 @@ fincompass:
     mode: DEMO_REPLAY
   personal:
     enabled: true
+  agent:
+    mode: DEMO

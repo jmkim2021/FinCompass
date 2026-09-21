@@ -14,6 +14,7 @@ import java.time.Clock;
 @ConditionalOnProperty(name="fincompass.personal.enabled",havingValue="true")
 public class SimulationConfiguration {
     @Bean SimulationEngine simulationEngine() { return new SimulationEngine(); }
+    @Bean TargetScenarioSearch targetScenarioSearch(FinancialTwinStore twins,SimulationEngine engine) { return new TargetScenarioSearch(twins,engine); }
     @Bean ScenarioStore scenarioStore(JdbcTemplate jdbc, PersonalFinanceCipher cipher, FinancialTwinStore twins,
                                       PlatformTransactionManager manager) { return new ScenarioStore(jdbc,cipher,twins,manager); }
     @Bean ScenarioService scenarioService(ScenarioStore store,FinancialTwinStore twins,SimulationEngine engine,ObjectProvider<Clock> clocks) {

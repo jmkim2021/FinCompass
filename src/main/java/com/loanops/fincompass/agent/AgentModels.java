@@ -8,7 +8,7 @@ import java.util.*;
 public final class AgentModels {
     private AgentModels() {}
 
-    public enum Intent { HOME_PURCHASE, FINANCIAL_OVERVIEW, PRODUCT_REVIEW, OPPORTUNITIES, UNKNOWN }
+    public enum Intent { HOME_PURCHASE, TARGET_SCENARIO_SEARCH, FINANCIAL_OVERVIEW, PRODUCT_REVIEW, OPPORTUNITIES, UNKNOWN }
     public enum ToolName {
         GET_FINANCIAL_SNAPSHOT("get_financial_snapshot"),
         GET_CASHFLOW_ANALYSIS("get_cashflow_analysis"),
@@ -23,7 +23,8 @@ public final class AgentModels {
         COMPARE_PRODUCT_CANDIDATES("compare_product_candidates"),
         GET_OPPORTUNITY_EVENTS("get_opportunity_events"),
         GET_CALCULATION_TRACE("get_calculation_trace"),
-        GET_PRODUCT_MATCH_TRACE("get_product_match_trace");
+        GET_PRODUCT_MATCH_TRACE("get_product_match_trace"),
+        SEARCH_HOME_PURCHASE_TARGET("search_home_purchase_target");
         private final String externalName;
         ToolName(String externalName) { this.externalName=externalName; }
         public String externalName() { return externalName; }
@@ -31,7 +32,15 @@ public final class AgentModels {
 
     public record ChatRequest(String question, BigDecimal housePrice, BigDecimal cashContribution,
                               BigDecimal mortgageAmount, BigDecimal annualInterestRate,
-                              Integer termYears, BigDecimal maxMonthlyPayment) {}
+                              Integer termYears, BigDecimal maxMonthlyPayment,
+                              BigDecimal targetMonthlyFreeCashflow,BigDecimal minEmergencyFundMonths,
+                              BigDecimal maxDebtServiceBurden,BigDecimal searchMinHousePrice,
+                              BigDecimal searchMaxHousePrice,BigDecimal searchPrecision) {
+        public ChatRequest(String question,BigDecimal housePrice,BigDecimal cashContribution,BigDecimal mortgageAmount,
+                           BigDecimal annualInterestRate,Integer termYears,BigDecimal maxMonthlyPayment){
+            this(question,housePrice,cashContribution,mortgageAmount,annualInterestRate,termYears,maxMonthlyPayment,null,null,null,null,null,null);
+        }
+    }
     public record Plan(Intent intent,List<ToolName> tools) {
         public Plan { tools=List.copyOf(tools); }
     }

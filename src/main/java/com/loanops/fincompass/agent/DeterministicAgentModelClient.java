@@ -9,6 +9,9 @@ public final class DeterministicAgentModelClient implements AgentModelClient {
     @Override public String version(){return "deterministic-agent-v1";}
     @Override public Plan plan(ChatRequest request){
         String q=request==null||request.question()==null?"":request.question().toLowerCase(Locale.ROOT);
+        if(q.contains("얼마까지")||q.contains("조건을 맞추")||q.contains("simulation boundary")||q.contains("target scenario"))
+            return new Plan(Intent.TARGET_SCENARIO_SEARCH,List.of(ToolName.GET_FINANCIAL_SNAPSHOT,ToolName.GET_CASHFLOW_ANALYSIS,
+                    ToolName.GET_DEBT_ANALYSIS,ToolName.SEARCH_HOME_PURCHASE_TARGET,ToolName.GET_CALCULATION_TRACE));
         if(q.contains("아파트")||q.contains("주택")||q.contains("집")||q.contains("home")||q.contains("buy"))
             return new Plan(Intent.HOME_PURCHASE,List.of(ToolName.GET_FINANCIAL_SNAPSHOT,ToolName.GET_DEBT_ANALYSIS,
                     ToolName.GET_CASHFLOW_ANALYSIS,ToolName.ESTIMATE_LOAN_CAPACITY,ToolName.SEARCH_LOAN_PRODUCTS,

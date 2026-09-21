@@ -81,7 +81,7 @@ class SimulationEngineTest {
     }
     @Test void goldenHomeBalanceSheetAndCashflowMatchIndependentOracle() {
         HomeResult home=engine.home(golden(),home("700000000","110000000","590000000",Adjustment.zero()));
-        assertThat(home.before()).hasSize(12);assertThat(home.after()).hasSameSizeAs(home.before());
+        assertThat(home.before()).hasSize(15);assertThat(home.after()).hasSameSizeAs(home.before());
         metric(home.before(),"NET_WORTH","90000000");metric(home.before(),"MONTHLY_FREE_CASHFLOW","1200000");
         metric(home.after(),"TOTAL_ASSETS","710000000");metric(home.after(),"TOTAL_LIABILITIES","620000000");
         metric(home.after(),"LIQUID_ASSETS","10000000");metric(home.after(),"NET_WORTH","90000000");

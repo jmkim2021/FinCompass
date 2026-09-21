@@ -51,10 +51,10 @@ class FinancialTwinIntegrationTest {
     @Autowired MockMvc http;
     final TwinCalculator calculator = new TwinCalculator();
 
-    @Test void goldenAssetsDebtAndAllElevenMetricsAreAvailable() {
+    @Test void goldenAssetsDebtAndAllFourteenMetricsAreAvailable() {
         Snapshot snapshot = store.latest(OWNER);
         assertThat(snapshot.status()).isEqualTo("COMPLETE");
-        assertThat(snapshot.result().metrics()).hasSize(11);
+        assertThat(snapshot.result().metrics()).hasSize(14);
         assertThat(snapshot.result().metrics().values()).allSatisfy(metric -> assertThat(metric.availability()).isEqualTo(Availability.AVAILABLE));
         amount(snapshot, "TOTAL_ASSETS", "120000000");
         amount(snapshot, "TOTAL_LIABILITIES", "30000000");

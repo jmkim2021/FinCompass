@@ -3,7 +3,7 @@
     "err_cd": "000",
     "err_msg": "정상",
     "prdt_div": "M",
-    "total_count": "3",
+    "total_count": "7",
     "now_page_no": "1",
     "max_page_no": "1",
     "baseList": [
@@ -51,6 +51,118 @@
         "dcls_strt_day": "20260820",
         "dcls_end_day": "20270819",
         "fin_co_subm_day": "202608181516"
+      },
+      {
+        "dcls_month": "202608",
+        "fin_co_no": "0030001",
+        "kor_co_nm": "한빛은행",
+        "fin_prdt_cd": "DEMO-FULL-1",
+        "fin_prdt_nm": "[합성 매칭 데모] 고정 안정형",
+        "join_way": "합성 데모 전용",
+        "loan_inci_expn": "명시비용 별도 확인",
+        "erly_rpay_fee": "기관 확인 필요",
+        "dly_rate": "기관 확인 필요",
+        "loan_lmt": "합성 데모 명시 범위 100,000,000~700,000,000원",
+        "dcls_strt_day": "20260820",
+        "dcls_end_day": "20270819",
+        "fin_co_subm_day": "202608181516",
+        "fincompass_demo": {
+          "productType": "MORTGAGE",
+          "purpose": "HOME",
+          "amountMin": "100000000",
+          "amountMax": "700000000",
+          "termMin": 20,
+          "termMax": 40,
+          "repaymentMethods": [
+            "AMORTIZING"
+          ],
+          "eligibilityText": "합성 데모: 성인 및 검증 소득 근거 보유 여부를 검토",
+          "constraints": "실제 승인·우대금리·담보평가와 무관한 포트폴리오 fixture"
+        }
+      },
+      {
+        "dcls_month": "202608",
+        "fin_co_no": "0040001",
+        "kor_co_nm": "새봄은행",
+        "fin_prdt_cd": "DEMO-FULL-2",
+        "fin_prdt_nm": "[합성 매칭 데모] 고정 균형형",
+        "join_way": "합성 데모 전용",
+        "loan_inci_expn": "명시비용 별도 확인",
+        "erly_rpay_fee": "기관 확인 필요",
+        "dly_rate": "기관 확인 필요",
+        "loan_lmt": "합성 데모 명시 범위 100,000,000~700,000,000원",
+        "dcls_strt_day": "20260820",
+        "dcls_end_day": "20270819",
+        "fin_co_subm_day": "202608181516",
+        "fincompass_demo": {
+          "productType": "MORTGAGE",
+          "purpose": "HOME",
+          "amountMin": "100000000",
+          "amountMax": "700000000",
+          "termMin": 20,
+          "termMax": 40,
+          "repaymentMethods": [
+            "AMORTIZING"
+          ],
+          "eligibilityText": "합성 데모: 성인 및 검증 소득 근거 보유 여부를 검토",
+          "constraints": "실제 승인·우대금리·담보평가와 무관한 포트폴리오 fixture"
+        }
+      },
+      {
+        "dcls_month": "202608",
+        "fin_co_no": "0050001",
+        "kor_co_nm": "나래은행",
+        "fin_prdt_cd": "DEMO-FULL-3",
+        "fin_prdt_nm": "[합성 매칭 데모] 변동 검토형",
+        "join_way": "합성 데모 전용",
+        "loan_inci_expn": "명시비용 별도 확인",
+        "erly_rpay_fee": "기관 확인 필요",
+        "dly_rate": "기관 확인 필요",
+        "loan_lmt": "합성 데모 명시 범위 100,000,000~700,000,000원",
+        "dcls_strt_day": "20260820",
+        "dcls_end_day": "20270819",
+        "fin_co_subm_day": "202608181516",
+        "fincompass_demo": {
+          "productType": "MORTGAGE",
+          "purpose": "HOME",
+          "amountMin": "100000000",
+          "amountMax": "700000000",
+          "termMin": 20,
+          "termMax": 40,
+          "repaymentMethods": [
+            "AMORTIZING"
+          ],
+          "eligibilityText": "합성 데모: 성인 및 검증 소득 근거 보유 여부를 검토",
+          "constraints": "실제 승인·우대금리·담보평가와 무관한 포트폴리오 fixture"
+        }
+      },
+      {
+        "dcls_month": "202608",
+        "fin_co_no": "0060001",
+        "kor_co_nm": "가온은행",
+        "fin_prdt_cd": "DEMO-FULL-4",
+        "fin_prdt_nm": "[합성 매칭 데모] 고정 보수형",
+        "join_way": "합성 데모 전용",
+        "loan_inci_expn": "명시비용 별도 확인",
+        "erly_rpay_fee": "기관 확인 필요",
+        "dly_rate": "기관 확인 필요",
+        "loan_lmt": "합성 데모 명시 범위 100,000,000~700,000,000원",
+        "dcls_strt_day": "20260820",
+        "dcls_end_day": "20270819",
+        "fin_co_subm_day": "202608181516",
+        "fincompass_demo": {
+          "productType": "MORTGAGE",
+          "purpose": "HOME",
+          "amountMin": "100000000",
+          "amountMax": "700000000",
+          "termMin": 20,
+          "termMax": 40,
+          "repaymentMethods": [
+            "AMORTIZING"
+          ],
+          "eligibilityText": "합성 데모: 성인 및 검증 소득 근거 보유 여부를 검토",
+          "constraints": "실제 승인·우대금리·담보평가와 무관한 포트폴리오 fixture"
+        }
       }
     ],
     "optionList": [
@@ -109,6 +221,62 @@
         "lend_rate_min": "4.60",
         "lend_rate_max": "6.20",
         "lend_rate_avg": "5.10"
+      },
+      {
+        "dcls_month": "202608",
+        "fin_co_no": "0030001",
+        "fin_prdt_cd": "DEMO-FULL-1",
+        "mrtg_type": "A",
+        "mrtg_type_nm": "아파트",
+        "rpay_type": "D",
+        "rpay_type_nm": "원리금균등상환",
+        "lend_rate_type": "F",
+        "lend_rate_type_nm": "고정금리",
+        "lend_rate_min": "4.00",
+        "lend_rate_max": "4.60",
+        "lend_rate_avg": "4.20"
+      },
+      {
+        "dcls_month": "202608",
+        "fin_co_no": "0040001",
+        "fin_prdt_cd": "DEMO-FULL-2",
+        "mrtg_type": "A",
+        "mrtg_type_nm": "아파트",
+        "rpay_type": "D",
+        "rpay_type_nm": "원리금균등상환",
+        "lend_rate_type": "F",
+        "lend_rate_type_nm": "고정금리",
+        "lend_rate_min": "4.10",
+        "lend_rate_max": "4.80",
+        "lend_rate_avg": "4.35"
+      },
+      {
+        "dcls_month": "202608",
+        "fin_co_no": "0050001",
+        "fin_prdt_cd": "DEMO-FULL-3",
+        "mrtg_type": "A",
+        "mrtg_type_nm": "아파트",
+        "rpay_type": "D",
+        "rpay_type_nm": "원리금균등상환",
+        "lend_rate_type": "C",
+        "lend_rate_type_nm": "변동금리",
+        "lend_rate_min": "3.80",
+        "lend_rate_max": "5.10",
+        "lend_rate_avg": "4.30"
+      },
+      {
+        "dcls_month": "202608",
+        "fin_co_no": "0060001",
+        "fin_prdt_cd": "DEMO-FULL-4",
+        "mrtg_type": "A",
+        "mrtg_type_nm": "아파트",
+        "rpay_type": "D",
+        "rpay_type_nm": "원리금균등상환",
+        "lend_rate_type": "F",
+        "lend_rate_type_nm": "고정금리",
+        "lend_rate_min": "4.40",
+        "lend_rate_max": "5.00",
+        "lend_rate_avg": "4.55"
       }
     ]
   },

@@ -14,13 +14,17 @@ import static com.loanops.fincompass.api.TwinController.DEMO_OWNER;
 @ConditionalOnProperty(name="fincompass.demo.enabled",havingValue="true")
 public class ScenarioController {
     private final ScenarioService scenarios;
-    public ScenarioController(ScenarioService scenarios) { this.scenarios=scenarios; }
+    private final TargetScenarioSearch targetSearch;
+    public ScenarioController(ScenarioService scenarios,TargetScenarioSearch targetSearch) { this.scenarios=scenarios;this.targetSearch=targetSearch; }
     @PostMapping("/scenarios/loan") public Scenario loan(@RequestBody LoanRequest request) {
         if(request==null)throw new IllegalArgumentException("Loan request required");
         return scenarios.createLoan(DEMO_OWNER,request.financialSnapshotId(),request.loan());
     }
     @PostMapping("/scenarios/home-purchase") public Scenario home(@RequestBody HomeInput request) {
         return scenarios.createHome(DEMO_OWNER,request);
+    }
+    @PostMapping("/scenarios/home-purchase/target-search") public TargetScenarioSearch.Result targetSearch(@RequestBody TargetScenarioSearch.Request request) {
+        return targetSearch.search(DEMO_OWNER,request);
     }
     @PostMapping("/scenarios/{id}/stress-test") public Scenario stress(@PathVariable UUID id,@RequestBody(required=false) StressRequest request) {
         return scenarios.stress(DEMO_OWNER,id,request==null?null:request.shocks());

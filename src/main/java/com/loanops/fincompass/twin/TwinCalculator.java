@@ -81,6 +81,7 @@ public final class TwinCalculator {
         observedOutflow = validTransactions ? monthly(observedOutflow, input.coveredMonths()) : null;
         living = validTransactions && classified ? monthly(living, input.coveredMonths()) : null;
         BigDecimal freeCashflow = subtract(subtract(subtract(observedIncome, living), debtService), fixed);
+        BigDecimal modeledOutflow = add(add(living,debtService),fixed);
         Map<String, Metric> metrics = new LinkedHashMap<>();
         money(metrics, "TOTAL_ASSETS", assets, "BALANCE_OR_OTHER_ASSETS_MISSING");
         money(metrics, "TOTAL_LIABILITIES", liabilities, "EXISTING_LOAN_BALANCE_MISSING");
@@ -92,6 +93,9 @@ public final class TwinCalculator {
             metrics.put("OBSERVED_MONTHLY_OUTFLOW", new Metric(money(observedOutflow), Availability.DEGRADED, "KRW_PER_MONTH", List.of("UNCLASSIFIED_DEBITS_INCLUDED")));
         }
         money(metrics, "MONTHLY_FREE_CASHFLOW", freeCashflow, "OBSERVED_INCOME_LIVING_SCHEDULED_DEBT_AND_FIXED_OBLIGATIONS_REQUIRED");
+        money(metrics, "MODELED_MONTHLY_OUTFLOW", modeledOutflow, "LIVING_SCHEDULED_DEBT_AND_FIXED_OBLIGATIONS_REQUIRED");
+        money(metrics, "MODELED_FIXED_OBLIGATIONS", fixed, "MONTHLY_FIXED_OBLIGATION_MISSING");
+        money(metrics, "MONTHLY_ESSENTIAL_EXPENSE", essential, "MONTHLY_ESSENTIAL_EXPENSE_MISSING");
         ratio(metrics, "EMERGENCY_FUND_MONTHS", liquid, essential, "MONTHS");
         ratio(metrics, "DEBT_SERVICE_BURDEN", debtService == null ? null : debtService.multiply(BigDecimal.valueOf(12)), verifiedIncome, "FRACTION");
         ratio(metrics, "DEBT_TO_ASSET_RATIO", liabilities, assets, "FRACTION");

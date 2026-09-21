@@ -78,6 +78,12 @@ fincompass:
 
   personal:
     enabled: ${PERSONAL_FINANCE_ENABLED:false}
+  agent:
+    mode: ${FINCOMPASS_AGENT_MODE:DEMO}
+    openai:
+      base-url: ${OPENAI_BASE_URL:https://api.openai.com}
+      api-key: ${OPENAI_API_KEY:}
+      model: ${OPENAI_MODEL:gpt-5.6-luna}
   data-quality:
     balance-stale-after: ${PERSONAL_BALANCE_STALE_AFTER:24h}
     policy-version: ${PERSONAL_DQ_POLICY_VERSION:personal-dq-v1}

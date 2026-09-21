@@ -16,9 +16,9 @@ class TwinCalculatorTest {
     private final TwinCalculator calculator = new TwinCalculator();
     private static final Instant AS_OF = Instant.parse("2026-09-01T00:00:00Z");
 
-    @Test void goldenHomeBuyerHasElevenIndependentMetrics() {
+    @Test void goldenHomeBuyerHasFourteenExplicitMetrics() {
         Result result = calculator.calculate(golden());
-        assertThat(result.metrics()).hasSize(11);
+        assertThat(result.metrics()).hasSize(14);
         assertMetric(result,"TOTAL_ASSETS","120000000.00");
         assertMetric(result,"TOTAL_LIABILITIES","30000000.00");
         assertMetric(result,"LIQUID_ASSETS","120000000.00");

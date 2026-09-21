@@ -23,7 +23,7 @@ public class ApiWebConfiguration implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         if (demoEnabled) {
-            for (String path : new String[]{"/api/v1/scenarios", "/api/v1/scenarios/**", "/api/v1/scenario-comparisons", "/api/v1/loan-product-matches", "/api/v1/loan-product-matches/**"}) {
+            for (String path : new String[]{"/api/v1/scenarios", "/api/v1/scenarios/**", "/api/v1/scenario-comparisons", "/api/v1/loan-product-matches", "/api/v1/loan-product-matches/**", "/api/v1/agent/chat"}) {
                 registry.addMapping(path).allowedOrigins(allowedOrigins).allowedMethods("GET", "POST").allowedHeaders("Content-Type").maxAge(3600);
             }
         }

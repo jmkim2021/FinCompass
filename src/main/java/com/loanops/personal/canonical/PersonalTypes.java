@@ -2,7 +2,7 @@ package com.loanops.personal.canonical;
 
 public final class PersonalTypes {
     private PersonalTypes() { }
-    public enum SourceType { REAL_PRODUCT_DATA, OPEN_BANKING_TEST, PUBLIC_MYDATA_MOCK, USER_INPUT, DERIVED, AIHUB_OFFLINE }
+    public enum SourceType { REAL_PRODUCT_DATA, DEMO_PRODUCT_FIXTURE, OPEN_BANKING_TEST, PUBLIC_MYDATA_MOCK, USER_INPUT, DERIVED, AIHUB_OFFLINE }
     public enum SourceMode { LIVE_TEST, DEMO_REPLAY, OFFLINE, MANUAL }
     public enum ProviderCode { OPEN_BANKING, PUBLIC_MYDATA, AIHUB_OFFLINE }
     public enum Capability { BALANCE, TRANSACTIONS, CARDS, LOANS, LEASES, INVESTMENTS, INCOME, EMPLOYMENT }
