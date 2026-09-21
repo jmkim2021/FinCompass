@@ -32,3 +32,13 @@ logs/
 
 # Testcontainers
 .testcontainers.properties
+
+# Private Open Banking configuration and generated secrets
+secrets/
+.local/
+*.local.yml
+*.local.yaml
+*.pem
+*.key
+*.p12
+*.pfx
