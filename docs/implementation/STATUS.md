@@ -1,13 +1,13 @@
 # FinCompass Agent — 구현 상태
 
-업데이트: 2026-09-21 (Asia/Seoul). Phase 4~10 구현과 최종 품질 게이트 완료.
+업데이트: 2026-09-22 (Asia/Seoul). Phase 4~10 구현, 최종 품질 게이트, GitHub 배포 완료.
 
 ## 현재 상태
 
-Phase 10 clean-DB Golden E2E, demo bootstrap, provenance/숫자/secret/원본 무결성 감사와 문서 정리를 완료했다. 통합 브랜치 최종 acceptance가 모두 green이다.
+Phase 10 clean-DB Golden E2E, demo bootstrap, provenance/숫자/secret/원본 무결성 감사와 문서 정리를 완료했다. 통합 브랜치와 main은 최종 release commit을 포함하며 GitHub origin에 push됐다.
 
-- Phase 3 `7b0f588`을 SSH origin에 push하고 main을 안전하게 fast-forward/push했다.
-- 현재 작업 브랜치 `phase/04-10-fincompass-completion`.
+- Phase 4~10 통합 브랜치를 SSH origin에 push하고 main을 `--ff-only`로 안전하게 fast-forward/push했다.
+- 현재 local/remote main과 `phase/04-10-fincompass-completion`은 최종 release history를 공유한다.
 - V11: immutable encrypted financial_snapshot/source_ref/metric/supplemental facts.
 - 11개 BigDecimal 지표, 결측/0분모/거래 분류/부채 이중차감 방지, 정확한 source-state fingerprint.
 - 별도 Golden fixture: Open Banking 1계좌/1잔액/32거래(25+7 pagination), PMD 66m 소득/EMPLOYED, 명시적 USER_INPUT 대출30m와 상환/지출 가정.
@@ -16,7 +16,7 @@ Phase 10 clean-DB Golden E2E, demo bootstrap, provenance/숫자/secret/원본 �
 - `FINANCIAL_SIMULATION_V1`: DECIMAL128 중간 계산, 월별 HALF_EVEN 2자리, 마지막 회차 잔액 정산, 11개 deterministic stress grid와 명시적 A~D 대안을 구현했다.
 - Golden A(7억원, 현금1.1억원, 주담대5.9억원, 4.5%, 360개월)는 월상환 2,989,443.33원, 총이자 486,199,597.17원, 구매후 월여유 -1,789,443.33원이다. 승인/적격 판정이 아니다.
 - V13 match run/candidate/score/scenario-result를 추가하고 기존 LoanOps serving product/term의 정확한 product·term·raw·source·publication 참조를 동결했다.
-- Hard Filter 뒤에만 `PRODUCT_MATCH_SCORE_V1`(35/25/20/10/10)을 실행한다. Golden serving 2개 term은 한도·기간·정확한 상환방식·적격성 결측으로 모두 `INSUFFICIENT_DATA`, score/rank null이다.
+- Hard Filter 뒤에만 `PRODUCT_MATCH_SCORE_V1`(35/25/20/10/10)을 실행한다. Phase 6 최초 검증의 serving 2개 term과 최종 Golden bootstrap의 4개 term은 모두 한도·기간·정확한 상환방식·적격성 결측으로 `INSUFFICIENT_DATA`, score/rank null이다.
 - V14 encrypted immutable opportunity event를 추가하고 `OPPORTUNITY_V1` 규칙으로 유동성 위험·부채부담 경고·금리 재검토·대환 검토를 근거와 함께 탐지한다. stale/partial/incomplete snapshot에서는 판정을 차단하며 동일 근거의 중복 이벤트를 만들지 않는다.
 - V15 encrypted immutable agent/tool audit를 추가했다. 공급자 중립 `AgentModelClient`, offline deterministic model, 기존 서비스만 호출하는 14개 typed tool, 필수 입력 질의, unsupported-number fallback과 재현 가능한 Golden 설명을 구현했다.
 - React/Vite 기존 스택에 FinCompass 9개 hash route, source badge, 명시적 Agent 입력, before/after·stress·candidate·opportunity·evidence 화면과 responsive/error/empty/warning 상태를 추가했다. 기존 LoanOps 운영 콘솔은 `#/admin`으로 보존했다.
@@ -39,7 +39,7 @@ Phase 10 clean-DB Golden E2E, demo bootstrap, provenance/숫자/secret/원본 �
 - Phase 10 final clean gate: **290/290 PASS, 실패0, 오류0, skip0** (2026-09-21 23:57 KST). `clean test bootJar` PASS, Golden E2E PASS.
 - 실행: Java21, `./gradlew test bootJar --offline --no-daemon`.
 - frontend `npm run typecheck`, `npm run build`: PASS.
-- diff 검토: 기존 migration 불변; V9→V10 전용 테스트 target10으로 유지; 최신 schema assertion11; 신규 source/store/calculation/API와 보안 경계 검토.
+- diff 검토: 기존 V1~V10 migration 불변; V9→V10 전용 테스트 target10으로 유지; clean DB 최신 schema assertion15; 신규 source/store/calculation/API와 보안 경계 검토.
 - 발견한 SQL JOIN 정렬 모호성은 수정 후 전체 회귀 통과. 마지막 게이트에는 loopback 및 최신 실패 노출 검증도 포함.
 
 ## Golden 검증값
@@ -54,6 +54,7 @@ Phase 10 clean-DB Golden E2E, demo bootstrap, provenance/숫자/secret/원본 �
 - V1~V10 diff: 0; migration은 V11~V15 additive.
 - 원본 `../Loanops`: HEAD `e9227c3491804b5892bc71e151608a044a26263c`, tracked 137, index/worktree clean.
 - 실제 값과 provenance: `GOLDEN_RESULTS.md`; 최종 API: `API.md`; 실행: root `README.md`.
+- GitHub: `origin/main`과 `origin/phase/04-10-fincompass-completion`에 최종 release history push 완료, force push 없음.
 
 ## 경계 및 제약
 
