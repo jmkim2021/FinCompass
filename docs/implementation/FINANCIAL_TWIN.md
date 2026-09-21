@@ -101,3 +101,14 @@ Phase 4의 세 summary 경로는 같은 frozen snapshot DTO를 반환하여 metr
 현재 금액 범위는 KRW 단일 통화, 명시적 잔액·거래·소득·supplemental 입력이다. 카드/대출 스케줄을 실기관 API에서 가져왔다는 주장을 하지 않는다. 검증 연소득은 Public MyData MOCK이며 실제 LIVE_TEST는 별도 credential 준비 후 검증 대상이다.
 
 최종 Phase 4 보강: demo 구성은 `server.address=127.0.0.1` 또는 `::1`을 시작 전에 필수 검증한다. latest API는 immutable snapshot과 별도로 `currentAssessment`에 최신 평가 ID·상태, 이전 정상값 사용 여부와 stale 경고를 제공한다.
+
+## Phase 11 현금흐름 의미 감사
+
+- `OBSERVED_MONTHLY_OUTFLOW` 3,400,000원은 거래에서 관측된 생활비 2,800,000원과 부채상환 600,000원의 합이다.
+- `MODELED_FIXED_OBLIGATIONS` 200,000원은 거래에 넣지 않은 별도 사용자 입력이다.
+- `MODELED_MONTHLY_OUTFLOW` 3,600,000원은 생활비 + 예정 부채상환 + 별도 고정의무다. 관측 부채상환과 예정 상환을 두 번 차감하지 않는다.
+- `MONTHLY_FREE_CASHFLOW` 1,200,000원은 관측 유입 4,800,000원에서 모델 총 월유출을 뺀 값이다.
+- `MONTHLY_ESSENTIAL_EXPENSE` 2,200,000원은 전체 생활비의 명시적 필수 부분집합이며 비상자금 개월 수의 분모다. 자유현금흐름에서 재차 차감하지 않는다.
+- `DEBT_SERVICE_BURDEN`은 분석용 비율이며 공식 규제 DSR이 아니다.
+
+총 14개 metric과 산식, source reference, supplemental fact는 Agent calculation trace에서도 조회된다.

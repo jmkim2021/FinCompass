@@ -112,3 +112,7 @@ STRESS는 원래 HOME scenario ID를 참조한다. 비교는 동일 snapshot·�
 이 문서를 작성하면서 별도 Python Decimal(50자리) 상환표 oracle을 실제 실행하여 golden A–D, +1/+2/+3pp, 무이자 마지막 납입, 소득·생활비·유동성·복합 shock 기준값을 산출했다. Java 엔진의 DECIMAL128/월 단위 반올림 정책과 대조하였다. 상세 산식 작업 파일은 개발 검증 자료이며 운영 계산 경로가 아니다.
 
 Java unit/integration/API, 불변 저장, 소유자 분리, 전체 backend regression 결과는 실제 실행이 완료된 뒤 `STATUS.md`에 기록한다. 실행하지 않은 검증을 PASS로 기록하지 않는다.
+
+## Target Scenario Search
+
+`POST /api/v1/scenarios/home-purchase/target-search`와 Agent tool `search_home_purchase_target`는 `TARGET_HOME_PRICE_SEARCH_V1`을 사용한다. fixed cash contribution, annual rate, term, repayment type에서 월납입·부채부담이 주택가격에 대해 단조 증가한다는 가정 아래 bounded binary search를 수행한다. 월 여유자금 최소, 비상자금 최소, 부채부담 최대 중 하나 이상을 명시해야 한다. 최대 테스트 가능 집값, 필요 대출, 월납입, 구매후 cashflow, 비상자금, 부채부담, binding constraint, 반복 수와 정밀도를 반환한다. 이는 `Simulation Boundary`이며 공식 감당가능가격·승인·추천이 아니다.

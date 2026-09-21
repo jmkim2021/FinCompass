@@ -1,28 +1,26 @@
 # Golden Demo 실제 검증 결과
 
-이 값은 `GoldenE2EIntegrationTest`가 2026-09-21 clean PostgreSQL에서 V1→V15 migration과 `fincompass-demo,golden-products` profile을 실제 실행하여 만든 `build/reports/fincompass/golden-results.json`에서 기록했다. PDF 예시를 복사한 값이 아니다. ID와 ciphertext는 실행마다 달라질 수 있지만 금융 결과와 규칙 버전은 동일하다.
+2026-09-22 `GoldenE2EIntegrationTest`가 clean PostgreSQL에서 V1→V15와 `fincompass-demo,golden-products`를 실행해 `build/reports/fincompass/golden-results.json`을 생성했다. 아래 값은 그 출력에서 기록했다.
 
-## Persona 입력
+## Persona 입력과 Financial Twin
 
-- 검증 연소득 66,000,000원 (`PUBLIC_MYDATA_MOCK`).
-- 유동자산 120,000,000원, 관측 월유입 4,800,000원, 생활비 2,800,000원 (`OPEN_BANKING_TEST`, `DEMO_REPLAY`).
-- 기존부채 30,000,000원, 예정 월상환 600,000원, 별도 고정의무 200,000원 (`USER_INPUT`, `DEMO_REPLAY`).
-- 집값 700,000,000원, 현금기여 110,000,000원, 주담대 590,000,000원, 연 4.5%, 360개월, AMORTIZING, 명시비용 0원.
-
-## Financial Twin
-
+- 검증 연소득 66,000,000원, 유동자산 120,000,000원, 기존부채 30,000,000원.
+- 관측 월유입 4,800,000원, 생활비 2,800,000원, 예정 월상환 600,000원, 별도 고정의무 200,000원, 월 필수지출 2,200,000원.
 - 총자산/유동자산 120,000,000원, 총부채 30,000,000원, 순자산 90,000,000원.
-- 관측 월유입 4,800,000원, 관측 월유출 3,400,000원, 월 여유자금 1,200,000원.
-- 비상자금 54.54545455개월.
-- 부채상환 부담 0.10909091, 부채/자산 0.25000000, 유동자산/자산 1.00000000.
+- 관측 거래 월유출 3,400,000원, 모델 총 월유출 3,600,000원, 월 여유자금 1,200,000원.
+- 비상자금 54.54545455개월, 분석용 부채상환 부담 0.10909091, 부채/자산 0.25000000, 유동자산/자산 1.00000000.
+
+비상자금 분모는 전체 생활비가 아니라 명시적 필수 부분집합 2,200,000원이다. 이 금액은 자유현금흐름에서 다시 차감하지 않는다.
 
 ## 7억원 구매 시나리오
 
-- 주담대 정규 월납입 2,989,443.33원, 총상환 1,076,199,597.17원, 총이자 486,199,597.17원.
+- 입력: 현금기여 110,000,000원, 주담대 590,000,000원, 연 4.5%, 360개월, AMORTIZING, 명시비용 0원.
+- 월납입 2,989,443.33원, 총상환 1,076,199,597.17원, 총이자 486,199,597.17원.
 - 구매후 총자산 710,000,000원, 총부채 620,000,000원, 유동자산 10,000,000원, 순자산 90,000,000원.
-- 구매후 월 총상환 3,589,443.33원, 월 여유자금 −1,789,443.33원, 비상자금 4.54545455개월.
-- 부채상환 부담 0.65262606, 부채/자산 0.87323944, 유동자산/자산 0.01408451.
-- 세금·취득비용은 명시적으로 0이며 추정하지 않았다.
+- 구매후 월 총상환 3,589,443.33원, 월 여유 −1,789,443.33원, 비상자금 4.54545455개월.
+- 분석용 부채상환 부담 0.65262606, 부채/자산 0.87323944, 유동자산/자산 0.01408451.
+
+독립 `Math.pow` 기준 구현으로 월납입을 대조했다. production은 DECIMAL128, 월별 2자리 `HALF_EVEN`, 마지막 회차 잔액 0 정산을 사용한다. 총이자는 월별 반올림 이자의 합이다.
 
 ## Stress grid
 
@@ -40,36 +38,43 @@
 | 유동자산 −30% | 2,989,443.33 | −1,789,443.33 | 0.65262606 | 3.18181818 |
 | 복합(+2%p/소득−20%/지출+10%/유동−20%) | 3,729,201.34 | −3,769,201.34 | 0.98390940 | 3.30578512 |
 
-## 명시적 대안
+## 대안과 회계 불변식
 
 - A 지금 구매: 월납입 2,989,443.33원, 총이자 486,199,597.17원, 월 여유 −1,789,443.33원.
 - B 가격 6억원: 대출 490,000,000원, 월납입 2,482,758.02원, 총이자 403,792,885.83원, 월 여유 −1,282,758.02원.
-- C 기존부채 우선상환: 30,000,000원 상환/월 600,000원 해제, 신규대출 620,000,000원, 월납입 3,141,448.92원, 총이자 510,921,612.21원, 월 여유 −1,341,448.92원.
-- D 12개월 지연: 월 1,200,000원 저축을 명시적으로 가정, 현금기여 124,400,000원, 대출 575,600,000원, 월납입 2,916,480.64원, 총이자 474,333,032.72원, 월 여유 −1,716,480.64원, 순자산 104,400,000원.
+- C 기존부채 우선상환: 현금과 부채를 각각 30,000,000원 줄이고 월 600,000원을 해제한다. 신규대출 620,000,000원, 월납입 3,141,448.92원, 총이자 510,921,612.21원, 월 여유 −1,341,448.92원.
+- D 12개월 지연: 1,200,000원×12=14,400,000원 저축, 현금기여 124,400,000원, 대출 575,600,000원, 월납입 2,916,480.64원, 총이자 474,333,032.72원, 월 여유 −1,716,480.64원, 순자산 104,400,000원.
 
-네 대안 모두 월 여유자금이 음수다. 상대 비교를 안전·최적·승인 가능성으로 바꾸지 않는다.
+모두 `자산−부채=순자산`, `집값=현금기여+주담대`를 만족하며 월 여유는 음수다.
 
-## LoanOps 상품 후보
+## Product Matching — Demo A
 
-합성 `DEMO_REPLAY` fixture가 LoanOps pipeline을 거쳐 3개 상품/4개 term으로 제공됐다.
+기존 합성 3개 상품/4개 term은 금액·기간·정확한 상환방식·eligibility가 없어 모두 `DEMO_PRODUCT_FIXTURE`, `INSUFFICIENT_DATA`, score/rank null이다.
 
-- 주택검토 A 고정: 4.00–5.20%, 평균 4.50%.
-- 주택검토 A 변동: 3.60–5.50%, 평균 결측.
-- 주택검토 B 고정: 4.20–5.80%, 평균 4.60%.
-- 주택검토 C 변동: 4.60–6.20%, 평균 5.10%.
+## Product Matching — Demo B
 
-모두 금액 범위, 기간 범위, 정확한 AMORTIZING mapping, 개인 eligibility가 없어 `INSUFFICIENT_DATA`다. score breakdown과 rank는 **산정하지 않았다(null)**. 완전한 합성 domain unit test에서만 35/25/20/10/10 score 합과 ranking을 검증한다.
+완전 합성 4개 상품도 동일 LoanOps raw → normalization → quality → publication → serving pipeline을 통과했다.
+
+| Rank | Fixture | Score | 월납입 | 총이자 | +2%p stress 월여유 |
+|---:|---|---:|---:|---:|---:|
+| 1 | DEMO-FULL-1 고정 안정형 | 45.0000 | 2,885,201.32 | 448,672,478.94 | −2,413,566.97 |
+| 2 | DEMO-FULL-3 변동 검토형 | 37.9102 | 2,919,741.51 | 461,106,941.35 | −2,451,939.46 |
+| 3 | DEMO-FULL-2 고정 균형형 | 34.3493 | 2,937,089.58 | 467,352,246.62 | −2,471,190.66 |
+| 4 | DEMO-FULL-4 고정 보수형 | 20.0000 | 3,006,997.09 | 492,518,952.85 | −2,548,623.15 |
+
+모두 `MATCHED_FOR_REVIEW`다. affordability/stress raw score는 0이며 순위는 승인·최적·추천이 아니다.
+
+## Target Scenario Search
+
+현금 110,000,000원, 연 4.5%, 360개월, 범위 110M–700M, 정밀도 100,000원, 월 여유 ≥500,000원 제약의 결과:
+
+- 최대 테스트 가능 집값 248,100,000원, 필요 주담대 138,100,000원.
+- 월납입 699,732.41원, 구매후 월 여유 500,267.59원.
+- 비상자금 4.54545455개월, 분석용 부채부담 0.23631498.
+- binding `MONTHLY_FREE_CASHFLOW_MIN`, 12회, `TARGET_HOME_PRICE_SEARCH_V1`.
+
+이는 공식 감당가능가격이 아닌 `Simulation Boundary`다.
 
 ## Opportunity와 Agent
 
-Agent의 명시적 7억원 HOME scenario에서 `LIQUIDITY_RISK`(월 여유 −1,789,443.33원, threshold 0)와 `DEBT_BURDEN_WARNING`(0.65262606, threshold 0.40)이 생성됐다. Agent는 12개 tool call을 모두 성공했고 calculation/simulation/product-match/rate-policy 버전을 저장했다. 최종 설명의 grounding fallback은 사용되지 않았으며, 설명 숫자는 총자산 120,000,000원, 부채 30,000,000원, 현재 월 여유 1,200,000원, 입력값과 월납입/구매후 월 여유 값으로 추적됐다.
-
-## Provenance 감사
-
-- 검증 연소득 → Twin result → PMD income canonical evidence → `PUBLIC_MYDATA_MOCK` fixture.
-- 유동자산 → Twin metric → canonical balance → Open Banking balance evidence → Golden balance fixture.
-- 기존부채 → Twin metric → deterministic USER_INPUT fact `EXISTING_LOAN_BALANCE`.
-- 월 여유자금 → Twin metric → 관측 거래 분류 + 예정상환 + 고정의무.
-- 주담대 월납입/Stress → immutable scenario result → Financial Snapshot + HomeInput + `FINANCIAL_SIMULATION_V1`.
-- 상품 금리 → frozen match candidate → serving term → normalized term → raw snapshot/hash → 합성 FSS fixture.
-- 상품 score → hard-filter 결측 근거 때문에 null; 만들어내지 않았다.
+Golden flow는 `LIQUIDITY_RISK`, `DEBT_BURDEN_WARNING`, synthetic product 기반 `REFINANCING_REVIEW`를 만든다. Agent는 12개 tool call을 성공했고 모든 설명 숫자를 입력 또는 tool result에 grounding했다. 외부 OpenAI adapter의 실제 credential 호출은 `REAL_LLM_RUNTIME_NOT_VERIFIED`다.

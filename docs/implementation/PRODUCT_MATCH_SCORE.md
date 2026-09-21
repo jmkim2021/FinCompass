@@ -13,3 +13,5 @@
 각 component는 rawScore, weightPercent, weightedScore를 저장한다. total은 weightedScore 합계이며 HALF_EVEN 4자리다. 동점은 simulation rate, loanProductId, productTermId 순으로 안정적으로 정렬한다. 순위는 승인·추천·최적 상품의 의미가 없다.
 
 금리 정책 `PRODUCT_RATE_V1`은 유효한 대표 평균금리, maxRate, 유일한 minRate 순으로 선택하고 선택 경고를 남긴다. 원천 percent는 계산 전에 annual fraction으로 나눈다. 기존 LoanOps 규칙대로 평균을 min/max 사이로 강제하지 않는다.
+
+Phase 11 Golden 완전 fixture 순위는 `DEMO-FULL-1` 45.0000, `DEMO-FULL-3` 37.9102, `DEMO-FULL-2` 34.3493, `DEMO-FULL-4` 20.0000이다. Golden 목표가 부담 가능 조건을 충족하지 않아 affordability/stress component는 0이다. 불완전 fixture에는 score 규칙을 실행하지 않는다.

@@ -60,3 +60,9 @@ Golden home 응답의 핵심 실제 값은 `homeResult.mortgage.regularMonthlyPa
 응답은 `agentRunId`, status, grounded answer, intent, snapshot/scenario/match ID, missingInputs, assumptions, warnings, limitations를 담는다. 필수 값이 없으면 `NEEDS_INPUT`이며 시나리오를 만들지 않는다.
 
 `GET /api/v1/agent/runs/{id}/trace`는 model provider/version, tool 순서, params/result hash, 규칙 버전, 허용 숫자 evidence, 최종 설명과 fallback 여부를 반환한다. 민감 payload는 DB에서 암호화된다.
+
+## Target Scenario Search
+
+`POST /api/v1/scenarios/home-purchase/target-search`
+
+필수 입력은 `financialSnapshotId`, `annualInterestRate`, `termYears`, `cashContribution`, `repaymentType`, `minHousePrice`, `maxHousePrice`, `searchPrecision`이다. `minimumMonthlyFreeCashflow`, `minimumEmergencyFundMonths`, `maximumDebtServiceBurden` 중 하나 이상의 constraint가 필요하다. 결과는 `feasible`, 최대 테스트 가능 집값, 필요 대출, 월납입, 구매후 cashflow, 비상자금, 부채부담, binding constraint, 반복 수, 정밀도, rule version과 warnings를 반환한다.

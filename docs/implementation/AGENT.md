@@ -2,7 +2,7 @@
 
 ## 실행 경계
 
-`AgentModelClient`는 공급자 중립 경계다. 기본 `DEMO_REPLAY` 구현은 CI와 오프라인 데모에서 결정론적으로 의도를 분류하고 근거가 있는 초안만 반환한다. 외부 LLM 자격증명은 빌드·테스트·데모에 필요하지 않다. 에이전트는 임의 SQL이나 코드 실행 도구를 제공하지 않으며, 등록된 14개 도구는 Financial Twin, Simulation, Product Matching, Opportunity 애플리케이션 서비스만 호출한다.
+`AgentModelClient`는 공급자 중립 경계다. 기본 `FINCOMPASS_AGENT_MODE=DEMO`는 CI와 오프라인 데모에서 결정론적으로 의도를 분류한다. `LLM`은 OpenAI Responses API용 `OpenAiAgentModelClient`를 선택한다. 외부 자격증명은 LLM mode를 명시적으로 선택할 때만 검증한다. 등록된 15개 도구는 Financial Twin, Simulation, Product Matching, Opportunity, Target Scenario Search 서비스만 호출한다.
 
 ## 숫자 근거와 실패 처리
 
@@ -14,4 +14,8 @@ V15의 `agent_run`과 `agent_tool_call`은 append-only이며 payload는 기존 p
 
 ## 실제 측정
 
-Phase 8 테스트의 curated intent 4종은 모두 예상 intent를 선택했다. Tool Selection Accuracy는 **4/4**, unsupported-number fixture의 Unsupported Number Rate는 fallback 뒤 **0/1**, Golden trace 필수 필드 완전성은 **1/1**, 명시적 tool-failure fixture 처리율은 **1/1**이다. 이 값은 작은 결정론적 테스트 세트의 결과이며 일반화된 모델 품질 지표가 아니다.
+Phase 11 curated eval의 Tool Selection Accuracy는 **24/24(100%)**다. invented rate/limit/payment/score/approval probability/house-price target 6개 adversarial 초안은 모두 rejection/fallback되어 최종 Unsupported Number Rate가 **0/6(0%)**다. 기존 integration test는 Golden trace 필수 필드 **1/1**, missing-input clarification, 명시적 tool failure 처리를 검증한다. 이는 결정론적 curated set 결과이며 일반화된 모델 품질 지표가 아니다.
+
+LLM에는 닫힌 intent/tool 목록과 deterministic tool 결과만 제공한다. LLM은 금융 숫자를 계산하거나 score/rank를 수정하지 않으며 provider 초안도 동일한 `NumericGrounding` 검사를 거친다. WireMock adapter 테스트는 통과했지만 실제 OpenAI credential 호출은 `REAL_LLM_RUNTIME_NOT_VERIFIED`다.
+
+HTTP 계약은 OpenAI 공식 [Create a model response](https://developers.openai.com/api/reference/cli/resources/responses/methods/create) 명세의 `POST /v1/responses`를 따른다. 기본 model은 `gpt-5.6-luna`이며 환경변수로 교체할 수 있다.

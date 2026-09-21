@@ -34,11 +34,11 @@ flowchart LR
 - **Public MyData:** provider-neutral consent/evidence 계약과 `PUBLIC_MYDATA_MOCK`만 제공한다. 실제 정부 연동은 구현하지 않았다.
 - **Canonical Personal Finance:** provider evidence를 계좌·잔액·거래·검증소득·재직 근거로 승격하며 동의, provenance, validation run을 보존한다.
 - **AI-Hub:** 사용자 연결 데이터가 아니며 `OFFLINE ONLY` 경계만 표시한다.
-- **Golden 상품:** LoanOps의 실제 수집/정규화/품질/publication 코드를 통과하는 합성 fixture다. `sourceType=REAL_PRODUCT_DATA`, `sourceMode=DEMO_REPLAY`를 함께 표시해 실제 상품으로 오인하지 않게 한다.
+- **Golden 상품:** LoanOps의 실제 수집/정규화/품질/publication 코드를 통과하는 합성 fixture다. origin은 항상 `sourceType=DEMO_PRODUCT_FIXTURE`, mode는 `DEMO_REPLAY`다. `REAL_PRODUCT_DATA`는 실제 trusted source로 수집된 상품에만 사용한다.
 
 ## Financial Twin
 
-V11의 snapshot은 원천 reference, 사용자 fact, 분류된 거래, 지표와 계산 규칙을 암호화된 append-only 이력으로 저장한다. 총자산·부채·순자산·유동자산·관측 유입/유출·월 여유자금·비상자금·부채부담·부채/자산·유동자산/자산을 `BigDecimal`로 계산한다. 결측과 0 분모는 0으로 바꾸지 않고 availability와 warning으로 남긴다.
+V11의 snapshot은 원천 reference, 사용자 fact, 분류된 거래, 지표와 계산 규칙을 암호화된 append-only 이력으로 저장한다. 14개 지표를 `BigDecimal`로 계산한다. 관측 거래 월유출 340만 원, 별도 모델 고정의무 20만 원, 모델 총 월유출 360만 원을 구분한다. 비상자금은 생활비 280만 원이 아니라 명시적 필수지출 220만 원을 분모로 사용한다. 결측과 0 분모는 0으로 바꾸지 않고 availability와 warning으로 남긴다.
 
 ## 재무 시뮬레이션
 
@@ -46,7 +46,13 @@ V11의 snapshot은 원천 reference, 사용자 fact, 분류된 거래, 지표와
 
 ## 상품 매칭
 
-Hard Filter가 품질, 금액, 기간, 상환방식, 적격성 결측을 먼저 처리한 뒤에만 `PRODUCT_MATCH_SCORE_V1`을 실행한다. 완전한 후보의 점수 가중치는 affordability 35, interest cost 25, stress resilience 20, preference fit 10, data quality 10이다. Golden 상품에는 한도·기간·정확한 상환방식·개인 적격성 근거가 없어 4개 term 모두 `INSUFFICIENT_DATA`; score와 rank는 null이다. 이 결과를 억지 Top-K로 만들지 않는다.
+Hard Filter가 품질, 금액, 기간, 상환방식, 적격성 결측을 먼저 처리한 뒤에만 `PRODUCT_MATCH_SCORE_V1`을 실행한다. 완전한 후보의 점수 가중치는 affordability 35, interest cost 25, stress resilience 20, preference fit 10, data quality 10이다.
+
+두 데모가 같은 trusted pipeline을 지난다. **Demo A — 안전성/정직성**은 원천 필드가 불완전한 4개 term을 `INSUFFICIENT_DATA`, score/rank `null`로 유지한다. **Demo B — 전체 매칭 역량**은 완전히 명시된 합성 상품 4개에 Hard Filter → 후보 시뮬레이션 → +2%p stress → score → Review Candidate rank를 실행한다. 모두 `DEMO_PRODUCT_FIXTURE`이며 실제 상품·승인·적격성을 뜻하지 않는다.
+
+## Target Scenario Search
+
+“7억은 부담이 큰데 월 여유자금 50만 원을 유지하려면?”이라는 질문은 LLM이 계산하지 않는다. `TARGET_HOME_PRICE_SEARCH_V1`이 고정 현금기여·금리·기간·상환방식과 사용자가 명시한 제약에서 10만 원 정밀도의 bounded binary search를 수행한다. Golden 결과는 최대 테스트 가능 집값 **248,100,000원**, 필요 주담대 **138,100,000원**, 월납입 **699,732.41원**, 구매후 월 여유 **500,267.59원**이다. 이는 `Simulation Boundary`이며 공식 감당가능가격이나 추천이 아니다.
 
 ## Opportunity Engine
 
@@ -54,13 +60,13 @@ Hard Filter가 품질, 금액, 기간, 상환방식, 적격성 결측을 먼저 
 
 ## FinCompass Agent
 
-`AgentModelClient`는 공급자 중립 경계다. 기본 `DEMO_REPLAY` 모델은 외부 LLM 없이 결정론적으로 intent와 tool flow를 선택한다. 14개 typed tool은 application service만 호출하며 임의 SQL·코드 실행 도구가 없다. 필수 입력이 없으면 값을 만들지 않고 `NEEDS_INPUT`을 반환한다.
+`AgentModelClient`는 공급자 중립 경계다. 기본 `FINCOMPASS_AGENT_MODE=DEMO`는 외부 LLM 없이 결정론적으로 intent와 tool flow를 선택한다. `LLM` mode는 OpenAI Responses API adapter를 사용한다. LLM은 intent 선택과 설명만 담당하고, 15개 typed tool과 결정론적 backend가 모든 금융 숫자·시뮬레이션·순위를 만든다. 임의 SQL·코드 실행 도구는 없으며 필수 입력이 없으면 값을 만들지 않고 `NEEDS_INPUT`을 반환한다.
 
 최종 설명의 모든 숫자 token은 사용자 입력 또는 tool result 숫자 집합과 대조한다. 근거 없는 숫자가 있으면 모델 초안을 버리고 결정론적 설명으로 대체한다. 실행·도구 call은 params/result hash, snapshot/scenario/match ID, 규칙, 가정, warning, limitation, 최종 설명과 함께 암호화된 append-only trace로 남는다.
 
 ## Consumer UI
 
-기본 화면은 `#/fincompass/dashboard`다. Data Connections, Financial Dashboard, Ask Agent, Scenario, Candidates, Stress, Alternatives, Opportunities, Evidence의 9개 route가 있다. source badge, 결측·stale·partial·error 상태와 warning을 숨기지 않는다. 기존 LoanOps 운영 콘솔은 `#/admin`에서 유지한다.
+기본 화면은 `#/fincompass/dashboard`다. Data Connections, Financial Dashboard, Ask Agent, Scenario, Candidates, Stress, Alternatives, Opportunities, Evidence의 9개 route가 있다. DEMO banner, source badge, 결측·stale·partial·error 상태와 warning을 숨기지 않는다. 기존 LoanOps 운영 콘솔은 `#/admin`에서 유지한다. Vitest/React Testing Library가 핵심 소비자 상태 7개를 자동 검증한다.
 
 ## 기술 스택
 
@@ -118,6 +124,7 @@ npm run dev
 - Open Banking: `OPEN_BANKING_MODE`, `OPEN_BANKING_BASE_URL`, `OPEN_BANKING_AUTHORIZATION_URI`, `OPEN_BANKING_TOKEN_URI`, `OPEN_BANKING_CLIENT_ID`, `OPEN_BANKING_CLIENT_SECRET`, `OPEN_BANKING_REDIRECT_URI`, `OPEN_BANKING_ENCRYPTION_KEY`
 - 개인 layer: `PERSONAL_FINANCE_ENABLED`, `PERSONAL_FINANCE_ENCRYPTION_KEY`, stale/policy 설정
 - CORS: `LOANOPS_API_ALLOWED_ORIGINS`
+- Agent: `FINCOMPASS_AGENT_MODE=DEMO|LLM`, `OPENAI_BASE_URL`, `OPENAI_MODEL`, `OPENAI_API_KEY`
 
 실제 secret은 환경변수 또는 git-ignored local profile에만 둔다. `.env.example`은 placeholder만 포함한다.
 
@@ -128,17 +135,19 @@ Financial Snapshot/analytics, Scenario, Product Match, Opportunity, Agent/trace 
 ## 테스트
 
 ```bash
-JAVA_HOME=/path/to/jdk-21 ./gradlew test bootJar --no-daemon
-cd frontend && npm run typecheck && npm run build
+JAVA_HOME=/path/to/jdk-21 ./gradlew clean test bootJar --no-daemon
+cd frontend && npm test -- --run && npm run typecheck && npm run build
 ```
 
 모든 금융 계산은 독립 기준값 또는 정확한 expected value로 검증한다. 외부 LLM에 의존하는 테스트는 없다. 최종 실제 실행 수는 [STATUS.md](docs/implementation/STATUS.md)에 기록하며, clean-DB E2E가 생성한 값은 [GOLDEN_RESULTS.md](docs/implementation/GOLDEN_RESULTS.md)에 있다.
 
+포트폴리오 캡처 항목과 실제 앱 탐색 순서는 [SCREENSHOT_GUIDE.md](docs/SCREENSHOT_GUIDE.md)에 있다.
+
 ## 알려진 제약과 향후 작업
 
-- 금융결제원 LIVE_TEST 실제 호출, 실제 Public MyData 정부 연동, production LLM adapter는 검증하지 않았다.
+- 금융결제원 LIVE_TEST 실제 호출, 실제 Public MyData 정부 연동, 실제 OpenAI credential runtime 호출은 검증하지 않았다. OpenAI adapter 자체는 WireMock으로 검증했다(`REAL_LLM_RUNTIME_NOT_VERIFIED`).
 - consumer API는 loopback demo owner 전용이며 production 다중 사용자 인증 UI가 아니다.
-- Golden 상품은 합성 replay이며 결측된 eligibility/한도/기간 때문에 score/rank가 없다.
+- Golden 상품은 모두 합성 replay다. 불완전 fixture는 의도적으로 score/rank가 없고, 완전 fixture는 오직 매칭 파이프라인 시연용 Review Candidate를 만든다.
 - 세금·취득비용·미래 집값·소득 상승을 추정하지 않는다.
 - key rotation, retention/legal deletion, provider correction/versioning 운영 절차가 필요하다.
 - 향후 작업은 LIVE sandbox 검증, production 인증/동의 UI, 실제 eligibility field 계약, key rotation/retention이다.

@@ -78,6 +78,8 @@ PDF의 월 카드 청구액 **147만 원**은 생활비 280만 원 안에 포함
 
 원천 fixture 단위 검증 `GoldenHomeBuyerReplayTest`는 2026-09-21 실행에서 **4/4 PASS**, 실패·skip 0이었다. 별도 fixture, 이전 fixture 보존, 25+7 pagination, 월 합계, 기간 격리, 경로 allowlist를 검사한다. 전체 Phase 4 회귀 및 저장/API 검증은 통합 실행 후 `STATUS.md`에 기록한다.
 
+Phase 11 최종 감사에서는 Financial Twin이 `MONTHLY_ESSENTIAL_EXPENSE`, `MODELED_FIXED_OBLIGATIONS`, `MODELED_MONTHLY_OUTFLOW`를 API와 trace에 명시적으로 노출하도록 보강했다. clean E2E 결과는 각각 2,200,000원, 200,000원, 3,600,000원이다. 이 fixture 계약의 2.2M 필수지출이 Emergency Fund 54.54545455개월의 분모임을 UI에서도 직접 표시한다.
+
 ## 재현성과 경계
 
 `GoldenHomeBuyerSources.seed(owner)`는 동일 소유자의 유효 동의와 Golden 계좌/PMD fixture를 찾고 이미 검증된 원천은 재사용한다. bootstrap runner는 이미 저장된 Financial Twin이 있으면 새로운 원천을 수집하지 않는다. snapshot fingerprint에는 canonical record/provenance/validation ID와 값, 입력 fact ID와 내용, 분류, 원천 기준일, rule version을 담는다.
