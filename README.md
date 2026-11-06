@@ -69,6 +69,4 @@ cd frontend && npm test -- --run && npm run typecheck && npm run build
 - 스크립트가 Docker 오류로 종료되면 Docker Desktop을 시작하고 다시 실행합니다. 로컬 `55432` 포트를 다른 프로그램이 사용 중이면 `POSTGRES_PORT`를 다른 값으로 지정합니다.
 - 실제 금융기관 연결이나 LLM 응답이 보이지 않는 것은 기본 데모의 정상 동작입니다. 기본 모드는 `DEMO_REPLAY`와 결정론적 Agent입니다.
 
-## 문의·라이선스·변경 이력
-
-질문이나 오류는 [GitHub Issues](https://github.com/jmkim2021/FinCompass/issues)에 남길 수 있습니다. 코드는 [MIT 라이선스](LICENSE)를 따릅니다. 변경 내역은 [커밋 기록](https://github.com/jmkim2021/FinCompass/commits/main)에서 확인할 수 있습니다.
+문의: jmkim020315@gmail.com
