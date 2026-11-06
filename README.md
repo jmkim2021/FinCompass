@@ -33,18 +33,27 @@ scripts/run-golden-demo.sh         로컬 데모 실행
 
 기존 LoanOps 코드를 이 저장소에 포함했기 때문에 상품 수집·품질 검증·현재 게시 데이터 조회 흐름도 함께 실행됩니다. 개인 데이터와 상품 데이터는 별도 경로로 처리하고, 시뮬레이션과 후보 비교에서 필요한 근거만 결합합니다.
 
-## 로컬 데모
+## 실행 조건과 로컬 데모
 
-JDK 21, Node.js 20.19 이상, Docker Compose가 필요합니다. 아래 스크립트는 격리된 로컬 PostgreSQL과 데모 입력을 준비합니다.
+JDK 21, Node.js 20.19 이상, Docker Compose, OpenSSL이 필요합니다. 첫 번째 터미널에서 아래 스크립트를 실행합니다. 스크립트는 데모 전용 PostgreSQL 볼륨을 매번 초기화하고 백엔드를 계속 실행합니다.
 
 ```bash
 ./scripts/run-golden-demo.sh
+```
+
+두 번째 터미널에서 프론트엔드를 실행합니다.
+
+```bash
 cd frontend
 npm ci
 npm run dev
 ```
 
 화면은 `http://localhost:5173/#/fincompass/dashboard`에서 열립니다. 운영 데이터 화면은 `#/admin`입니다. 실제 연동용 설정은 `.env.example`을 참고하며, 비밀값은 저장소에 넣지 않습니다.
+
+## 사용 예시
+
+대시보드에서 시나리오 화면으로 이동해 구매가격·보유 현금·금리·기간을 입력하면 구매 전후 월여유금액과 상환액을 비교할 수 있습니다. 스트레스 화면에서는 금리 상승과 소득 감소가 결과에 미치는 영향을 확인하고, 근거 화면에서 사용한 데이터·가정·계산 규칙을 추적할 수 있습니다. 기본 데모의 모든 상품은 합성 데이터로 표시됩니다.
 
 ## 검증
 
@@ -54,3 +63,12 @@ cd frontend && npm test -- --run && npm run typecheck && npm run build
 ```
 
 백엔드 테스트는 PostgreSQL Testcontainers와 고정된 입력으로 데이터 승격, 계산값, 상품 비교, Agent 도구 호출을 확인합니다. 외부 금융 API나 LLM 호출 없이 실행되도록 구성했습니다.
+
+## 실행 중 문제가 생기면
+
+- 스크립트가 Docker 오류로 종료되면 Docker Desktop을 시작하고 다시 실행합니다. 로컬 `55432` 포트를 다른 프로그램이 사용 중이면 `POSTGRES_PORT`를 다른 값으로 지정합니다.
+- 실제 금융기관 연결이나 LLM 응답이 보이지 않는 것은 기본 데모의 정상 동작입니다. 기본 모드는 `DEMO_REPLAY`와 결정론적 Agent입니다.
+
+## 문의·라이선스·변경 이력
+
+질문이나 오류는 [GitHub Issues](https://github.com/jmkim2021/FinCompass/issues)에 남길 수 있습니다. 코드는 [MIT 라이선스](LICENSE)를 따릅니다. 변경 내역은 [커밋 기록](https://github.com/jmkim2021/FinCompass/commits/main)에서 확인할 수 있습니다.
